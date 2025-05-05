@@ -1,7 +1,7 @@
-import { createClient } from "@commercetools/sdk-client";
-import { createAuthMiddlewareForClientCredentialsFlow } from "@commercetools/sdk-auth";
-import { createHttpMiddleware } from "@commercetools/sdk-middleware-http";
-import { createApiBuilderFromCtpClient } from "@commercetools/platform-sdk";
+import { createClient } from '@commercetools/sdk-client';
+import { createAuthMiddlewareForClientCredentialsFlow } from '@commercetools/sdk-auth';
+import { createHttpMiddleware } from '@commercetools/sdk-middleware-http';
+import { createApiBuilderFromCtpClient } from '@commercetools/platform-sdk';
 
 const projectKey = process.env.CT_PROJECT_KEY!;
 const authMiddleware = createAuthMiddlewareForClientCredentialsFlow({
