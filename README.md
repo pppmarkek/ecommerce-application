@@ -4,14 +4,14 @@
 
 ## 📖 Project Overview
 
-E‑Comm App is a scalable and maintainable e-commerce platform front-end, designed to deliver a seamless shopping experience. This repository contains all the source code, configuration, and documentation needed to get started.
+E-Comm App delivers a scalable and maintainable platform for online shopping, focusing on modular architecture and high performance. It integrates with CommerceTools for backend APIs and provides a user-friendly interface.
 
-Key objectives:
+### Key Objectives
 
-* **Modularity**: Feature-based folder structure for easy navigation and maintenance.
-* **Performance**: Optimized builds with Vite, lazy loading, and code splitting.
-* **Quality**: Strict TypeScript typing, ESLint + Prettier formatting, and automated tests.
-* **User Experience**: Responsive UI powered by Material UI and client-side routing.
+* **Modularity**: Feature-driven folder structure for easy navigation and maintenance.
+* **Performance**: Fast development with Vite, optimized bundles, and code splitting.
+* **Quality**: Strict TypeScript types, ESLint + Prettier formatting, and comprehensive tests with Vitest.
+* **UX**: Responsive design using Material UI and smooth client-side routing.
 
 ## 🛠️ Technology Stack
 
@@ -22,97 +22,110 @@ Key objectives:
 * **HTTP Client**: Axios
 * **Bundler**: Vite
 * **Language**: TypeScript
-* **Linting**: ESLint + Prettier
-* **Hooks Management**: Husky + lint-staged
+* **Linting & Formatting**: ESLint + Prettier
+* **Git Hooks**: Husky + lint-staged
 * **Testing**: Vitest + Testing Library (React, Jest DOM)
-* **API Integration**: CommerceTools Platform SDK
+* **Backend API**: CommerceTools Platform SDK
 
 ## 🚀 Getting Started
 
-### Prerequisites
+Follow these steps to set up the project locally:
 
-* Node.js v18+ and npm
-* Git
+1. **Clone the repository**
 
-### Installation
+   ```bash
+   git clone https://github.com/pppmarkek/ecommerce-application.git
+   cd ecommerce-application
+   ```
+2. **Install dependencies**
 
-```bash
-# Clone the repository
-git clone git@github.com:<your-username>/ecomm-app.git
-cd ecomm-app
+   ```bash
+   npm install
+   ```
+3. **Set up environment variables**
 
-# Install dependencies
-npm install
-```
+   * Copy `.env.example` to `.env`:
 
-### Environment Variables
+     ```bash
+     cp .env.example .env
+     ```
+   * Open `.env` and fill in your CommerceTools credentials:
 
-Create a `.env` file in the project root with the following:
+     ```dotenv
+     CT_PROJECT_KEY=your_project_key
+     CT_CLIENT_ID=your_client_id
+     CT_CLIENT_SECRET=your_client_secret
+     CT_API_URL=https://api.region.gcp.commercetools.com
+     CT_AUTH_URL=https://auth.region.gcp.commercetools.com
+     ```
+4. **Start development server**
 
-```dotenv
-CT_PROJECT_KEY=<your-ctp-project-key>
-CT_CLIENT_ID=<your-ctp-client-id>
-CT_CLIENT_SECRET=<your-ctp-client-secret>
-CT_API_URL=https://api.<region>.commercetools.com
-CT_AUTH_URL=https://auth.<region>.commercetools.com
-```
+   ```bash
+   npm run dev
+   ```
+5. **Open the application**
 
-### Available Scripts
+   * Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
-| Command                | Description                                                                |
-| ---------------------- | -------------------------------------------------------------------------- |
-| `npm run dev`          | Start development server on [http://localhost:3000](http://localhost:3000) |
-| `npm run build`        | Create production build in `/build`                                        |
-| `npm run preview`      | Serve production build locally                                             |
-| `npm run lint`         | Run ESLint on `src/`                                                       |
-| `npm run lint:fix`     | Auto-fix linting issues                                                    |
-| `npm run format`       | Format code with Prettier                                                  |
-| `npm run format:check` | Check code formatting without writing                                      |
-| `npm run test`         | Run unit tests once                                                        |
-| `npm run test:watch`   | Run tests in watch mode                                                    |
-| `npm run coverage`     | Generate test coverage report                                              |
+## ⚙️ Available Scripts
+
+| Command                | Description                                                                          |
+| ---------------------- | ------------------------------------------------------------------------------------ |
+| `npm run dev`          | Launch the app in development mode at [http://localhost:3000](http://localhost:3000) |
+| `npm run build`        | Build the app for production into the `/build` directory                             |
+| `npm run preview`      | Serve the production build locally                                                   |
+| `npm run lint`         | Run ESLint to detect code issues in TypeScript and React files                       |
+| `npm run lint:fix`     | Automatically fix ESLint issues                                                      |
+| `npm run format`       | Format all source files with Prettier                                                |
+| `npm run format:check` | Check code formatting without modifying files                                        |
+| `npm run test`         | Run all tests once with Vitest                                                       |
+| `npm run test:watch`   | Run Vitest in watch mode for continuous testing                                      |
+| `npm run coverage`     | Generate a test coverage report                                                      |
 
 ## 📂 Folder Structure
 
-```
+```plaintext
 ecomm-app/
-├─ public/                 # Static assets (index.html, favicon)
+├─ public/                   # Static resources (index.html, favicon)
 ├─ src/
-│  ├─ assets/              # Images, styles, fonts
-│  ├─ components/          # Reusable UI components
-│  ├─ features/            # Feature modules (Redux slices, pages)
-│  ├─ hooks/               # Custom React hooks
-│  ├─ pages/               # Route-based page components
-│  ├─ services/            # API clients (CommerceTools, axios)
-│  ├─ store/               # Redux store configuration
-│  ├─ types/               # TypeScript types and interfaces
-│  ├─ utils/               # Utility functions
-│  ├─ App.tsx              # Root component
-│  └─ index.tsx            # Entry point
-├─ .husky/                 # Git hooks (pre-commit lint & format)
-├─ .env                    # Environment variables (gitignored)
-├─ .eslintrc.json          # ESLint configuration
-├─ .prettierrc.json        # Prettier configuration
-├─ vite.config.ts          # Vite configuration
-├─ tsconfig.json           # TypeScript configuration
-└─ README.md
+│  ├─ assets/                # Images, fonts, global styles
+│  ├─ components/            # Reusable UI components
+│  ├─ features/              # Feature modules (Redux slices, pages)
+│  ├─ hooks/                 # Custom React hooks
+│  ├─ pages/                 # Route-based page components
+│  ├─ services/              # API clients (CommerceTools, axios)
+│  ├─ store/                 # Redux store setup
+│  ├─ types/                 # TypeScript interfaces and types
+│  ├─ utils/                 # Helper functions
+│  ├─ setupTests.ts          # Test setup (jest-dom)
+│  ├─ App.tsx                # Root component
+│  └─ index.tsx              # Application entry point
+├─ .husky/                   # Git hooks (lint & format)
+├─ .env.example             # Sample environment variables file
+├─ .eslintrc.json            # ESLint configuration
+├─ .prettierrc.json          # Prettier configuration
+├─ vite.config.ts            # Vite configuration
+├─ tsconfig.json             # TypeScript configuration
+└─ README.md                 # Project documentation
 ```
 
 ## 🧪 Testing
 
-* **Unit & Integration**: Vitest + @testing-library/react
-* **Setup**: See `src/setupTests.ts` for global imports
-* **Coverage**: Report generated in `coverage/` folder when running `npm run coverage`
+* **Test Runner**: Vitest
+* **Assertions & DOM**: @testing-library/react, @testing-library/jest-dom
+* **Setup**: `src/setupTests.ts` initializes jest-dom matchers.
+* **Coverage**: Run `npm run coverage` to generate a coverage report in `coverage/`.
 
 ## 🤝 Contributing
 
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feat/your-feature`
-3. Commit changes and push: `git push origin feat/your-feature`
-4. Open a Pull Request and describe your changes
+1. Fork the repository.
+2. Create a branch: `git checkout -b feat/your-feature`.
+3. Commit your changes: `git commit -m "feat: description"`.
+4. Push to your fork: `git push origin feat/your-feature`.
+5. Open a Pull Request and describe your work.
 
-Please follow [Pull Request Template](.github/PULL_REQUEST_TEMPLATE.md) when creating PRs.
+Please follow the [Pull Request Template](.github/PULL_REQUEST_TEMPLATE.md) when submitting PRs.
 
 ## 📄 License
 
-This project is open source and available under the MIT License.
+This project is open source under the **MIT License**.
