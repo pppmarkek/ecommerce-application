@@ -1,57 +1,118 @@
 # E-Comm App
 
-This project is a modern e-commerce front-end built with React, Redux Toolkit, Material UI, React Router, and Axios.
+**A modern e-commerce front-end built with React, Redux Toolkit, Material UI, React Router, and Axios.**
 
-## Features
+## 📖 Project Overview
 
-- 🔄 State management with Redux Toolkit  
-- 🎨 UI components from Material UI  
-- 🚀 Client-side routing with React Router DOM  
-- 🔗 API calls using Axios  
+E‑Comm App is a scalable and maintainable e-commerce platform front-end, designed to deliver a seamless shopping experience. This repository contains all the source code, configuration, and documentation needed to get started.
 
-# Getting Started with Create React App
+Key objectives:
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+* **Modularity**: Feature-based folder structure for easy navigation and maintenance.
+* **Performance**: Optimized builds with Vite, lazy loading, and code splitting.
+* **Quality**: Strict TypeScript typing, ESLint + Prettier formatting, and automated tests.
+* **User Experience**: Responsive UI powered by Material UI and client-side routing.
 
-## Available Scripts
+## 🛠️ Technology Stack
 
-In the project directory, you can run:
+* **Framework**: React 19.x
+* **State Management**: Redux Toolkit
+* **UI Library**: Material UI (MUI)
+* **Routing**: React Router DOM
+* **HTTP Client**: Axios
+* **Bundler**: Vite
+* **Language**: TypeScript
+* **Linting**: ESLint + Prettier
+* **Hooks Management**: Husky + lint-staged
+* **Testing**: Vitest + Testing Library (React, Jest DOM)
+* **API Integration**: CommerceTools Platform SDK
 
-### `npm start`
+## 🚀 Getting Started
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### Prerequisites
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+* Node.js v18+ and npm
+* Git
 
-### `npm test`
+### Installation
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+# Clone the repository
+git clone git@github.com:<your-username>/ecomm-app.git
+cd ecomm-app
 
-### `npm run build`
+# Install dependencies
+npm install
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### Environment Variables
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Create a `.env` file in the project root with the following:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```dotenv
+CT_PROJECT_KEY=<your-ctp-project-key>
+CT_CLIENT_ID=<your-ctp-client-id>
+CT_CLIENT_SECRET=<your-ctp-client-secret>
+CT_API_URL=https://api.<region>.commercetools.com
+CT_AUTH_URL=https://auth.<region>.commercetools.com
+```
 
-### `npm run eject`
+### Available Scripts
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+| Command                | Description                                                                |
+| ---------------------- | -------------------------------------------------------------------------- |
+| `npm run dev`          | Start development server on [http://localhost:3000](http://localhost:3000) |
+| `npm run build`        | Create production build in `/build`                                        |
+| `npm run preview`      | Serve production build locally                                             |
+| `npm run lint`         | Run ESLint on `src/`                                                       |
+| `npm run lint:fix`     | Auto-fix linting issues                                                    |
+| `npm run format`       | Format code with Prettier                                                  |
+| `npm run format:check` | Check code formatting without writing                                      |
+| `npm run test`         | Run unit tests once                                                        |
+| `npm run test:watch`   | Run tests in watch mode                                                    |
+| `npm run coverage`     | Generate test coverage report                                              |
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## 📂 Folder Structure
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+```
+ecomm-app/
+├─ public/                 # Static assets (index.html, favicon)
+├─ src/
+│  ├─ assets/              # Images, styles, fonts
+│  ├─ components/          # Reusable UI components
+│  ├─ features/            # Feature modules (Redux slices, pages)
+│  ├─ hooks/               # Custom React hooks
+│  ├─ pages/               # Route-based page components
+│  ├─ services/            # API clients (CommerceTools, axios)
+│  ├─ store/               # Redux store configuration
+│  ├─ types/               # TypeScript types and interfaces
+│  ├─ utils/               # Utility functions
+│  ├─ App.tsx              # Root component
+│  └─ index.tsx            # Entry point
+├─ .husky/                 # Git hooks (pre-commit lint & format)
+├─ .env                    # Environment variables (gitignored)
+├─ .eslintrc.json          # ESLint configuration
+├─ .prettierrc.json        # Prettier configuration
+├─ vite.config.ts          # Vite configuration
+├─ tsconfig.json           # TypeScript configuration
+└─ README.md
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## 🧪 Testing
 
-## Learn More
+* **Unit & Integration**: Vitest + @testing-library/react
+* **Setup**: See `src/setupTests.ts` for global imports
+* **Coverage**: Report generated in `coverage/` folder when running `npm run coverage`
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+## 🤝 Contributing
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feat/your-feature`
+3. Commit changes and push: `git push origin feat/your-feature`
+4. Open a Pull Request and describe your changes
+
+Please follow [Pull Request Template](.github/PULL_REQUEST_TEMPLATE.md) when creating PRs.
+
+## 📄 License
+
+This project is open source and available under the MIT License.

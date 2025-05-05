@@ -24,7 +24,7 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json,css,md}\"",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
     "lint:fix": "eslint --fix \"src/**/*.{ts,tsx}\"",
-    "test": "vitest",
+    "test": "vitest run",
     "test:watch": "vitest watch",
     "coverage": "vitest run --coverage"
   },
