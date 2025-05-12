@@ -8,24 +8,24 @@ E-Comm App delivers a scalable and maintainable platform for online shopping, fo
 
 ### Key Objectives
 
-* **Modularity**: Feature-driven folder structure for easy navigation and maintenance.
-* **Performance**: Fast development with Vite, optimized bundles, and code splitting.
-* **Quality**: Strict TypeScript types, ESLint + Prettier formatting, and comprehensive tests with Vitest.
-* **UX**: Responsive design using Material UI and smooth client-side routing.
+- **Modularity**: Feature-driven folder structure for easy navigation and maintenance.
+- **Performance**: Fast development with Vite, optimized bundles, and code splitting.
+- **Quality**: Strict TypeScript types, ESLint + Prettier formatting, and comprehensive tests with Vitest.
+- **UX**: Responsive design using Material UI and smooth client-side routing.
 
 ## 🛠️ Technology Stack
 
-* **Framework**: React 19.x
-* **State Management**: Redux Toolkit
-* **UI Library**: Material UI (MUI)
-* **Routing**: React Router DOM
-* **HTTP Client**: Axios
-* **Bundler**: Vite
-* **Language**: TypeScript
-* **Linting & Formatting**: ESLint + Prettier
-* **Git Hooks**: Husky + lint-staged
-* **Testing**: Vitest + Testing Library (React, Jest DOM)
-* **Backend API**: CommerceTools Platform SDK
+- **Framework**: React 19.x
+- **State Management**: Redux Toolkit
+- **UI Library**: Material UI (MUI)
+- **Routing**: React Router DOM
+- **HTTP Client**: Axios
+- **Bundler**: Vite
+- **Language**: TypeScript
+- **Linting & Formatting**: ESLint + Prettier
+- **Git Hooks**: Husky + lint-staged
+- **Testing**: Vitest + Testing Library (React, Jest DOM)
+- **Backend API**: CommerceTools Platform SDK
 
 ## 🚀 Getting Started
 
@@ -37,19 +37,22 @@ Follow these steps to set up the project locally:
    git clone https://github.com/pppmarkek/ecommerce-application.git
    cd ecommerce-application
    ```
+
 2. **Install dependencies**
 
    ```bash
    npm install
    ```
+
 3. **Set up environment variables**
 
-   * Copy `.env.example` to `.env`:
+   - Copy `.env.example` to `.env`:
 
      ```bash
      cp .env.example .env
      ```
-   * Open `.env` and fill in your CommerceTools credentials:
+
+   - Open `.env` and fill in your CommerceTools credentials:
 
      ```dotenv
      CT_PROJECT_KEY=your_project_key
@@ -58,14 +61,16 @@ Follow these steps to set up the project locally:
      CT_API_URL=https://api.region.gcp.commercetools.com
      CT_AUTH_URL=https://auth.region.gcp.commercetools.com
      ```
+
 4. **Start development server**
 
    ```bash
    npm run dev
    ```
+
 5. **Open the application**
 
-   * Visit [http://localhost:3000](http://localhost:3000) in your browser.
+   - Visit [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## ⚙️ Available Scripts
 
@@ -111,10 +116,10 @@ ecomm-app/
 
 ## 🧪 Testing
 
-* **Test Runner**: Vitest
-* **Assertions & DOM**: @testing-library/react, @testing-library/jest-dom
-* **Setup**: `src/setupTests.ts` initializes jest-dom matchers.
-* **Coverage**: Run `npm run coverage` to generate a coverage report in `coverage/`.
+- **Test Runner**: Vitest
+- **Assertions & DOM**: @testing-library/react, @testing-library/jest-dom
+- **Setup**: `src/setupTests.ts` initializes jest-dom matchers.
+- **Coverage**: Run `npm run coverage` to generate a coverage report in `coverage/`.
 
 ## 🤝 Contributing
 
