@@ -8,6 +8,10 @@ export interface CustomerTokenResponse {
   token_type: string;
 }
 
+interface ErrorResponse {
+  error_description?: string;
+}
+
 export const loginCustomer = async (
   email: string,
   password: string,
@@ -35,8 +39,9 @@ export const loginCustomer = async (
   });
 
   if (resp.status !== 200) {
-    const errDesc = (resp.data as any).error_description;
-    throw new Error(errDesc || 'Login error');
+    const errData = resp.data as unknown as ErrorResponse;
+    const errDesc = errData.error_description;
+    throw new Error(errDesc ?? 'Login error');
   }
 
   return resp.data;

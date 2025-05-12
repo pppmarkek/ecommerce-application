@@ -7,8 +7,8 @@ import { Input } from '@/components/Input/Input';
 import { Button } from '@/components/Button/Button';
 import { loginCustomer } from '@/services/api';
 import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/store';
 import { fetchMe } from '@/store/userSlice';
+import { AppDispatch } from '@/store';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
