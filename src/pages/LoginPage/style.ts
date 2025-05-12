@@ -9,7 +9,7 @@ export const Wrapper = styled(Grid)`
 
 export const LoginBox = styled(Grid)`
   justify-content: center;
-  gap: 30px;
+  gap: 10px;
   width: 350px;
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.4);

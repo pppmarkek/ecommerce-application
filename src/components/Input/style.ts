@@ -10,7 +10,7 @@ export const StyledInput = styled(Input)<CustomInputProps>`
   color: #fff;
   width: ${(props) => props.width || '100%'};
   height: ${(props) => props.height || '40px'};
-  padding: ${(props) => props.padding || '10px'};
+  padding: ${(props) => props.padding || '10px 0px'};
 
   input {
     color: #fff;
