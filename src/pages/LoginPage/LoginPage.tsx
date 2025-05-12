@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Grid, Typography, IconButton } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { LoginBox, Wrapper } from './style';
@@ -119,7 +119,12 @@ export const LoginPage = () => {
             </Typography>
           </Grid>
 
-          <Button type="submit">Login</Button>
+          <Grid container width={'100%'} gap={'5px'}>
+            <Button width="100%" type="submit">
+              Login
+            </Button>
+            <Link to={'/signup'}>Registration</Link>
+          </Grid>
         </LoginBox>
       </form>
     </Wrapper>
