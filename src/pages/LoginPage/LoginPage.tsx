@@ -1,15 +1,22 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Grid, Typography, IconButton } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { LoginBox, Wrapper } from './style';
 import { Input } from '@/components/Input/Input';
 import { Button } from '@/components/Button/Button';
+import { loginCustomer } from '@/services/api';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store';
+import { fetchMe } from '@/store/userSlice';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+  const [errors, setErrors] = useState<{ email?: string; password?: string; login?: string }>({});
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
 
   const validateEmail = (email: string) => {
     if (!email.trim()) return 'Email is required.';
@@ -38,33 +45,54 @@ export const LoginPage = () => {
       return;
     }
 
-    setErrors({});
-    console.log(email, password);
+    try {
+      setErrors({});
+      const { access_token, refresh_token } = await loginCustomer(email, password);
+      localStorage.setItem('accessToken', access_token);
+      localStorage.setItem('refreshToken', refresh_token);
+      await dispatch(fetchMe()).unwrap();
+      navigate('/');
+    } catch (err) {
+      setErrors({
+        login:
+          err instanceof Error &&
+          'response' in err &&
+          (err.response as { data?: { error_description?: string } })?.data?.error_description
+            ? (err.response as { data?: { error_description?: string } })?.data?.error_description
+            : 'An unexpected error occurred.',
+      });
+    }
   };
 
   return (
     <Wrapper container>
       <form onSubmit={handleSubmit} noValidate>
         <LoginBox container>
-          <Typography variant="h4">Login</Typography>
+          <Grid>
+            <Typography variant="h4">Login</Typography>
+            <Typography variant="inherit" color="error" minHeight="20px" width={'100%'}>
+              {errors.login}
+            </Typography>
+          </Grid>
 
-          <Grid container width="100%" direction="column" alignItems={'flex-start'}>
+          <Grid container direction="column" alignItems="flex-start" width={'100%'}>
             <Typography variant="subtitle1">Email</Typography>
             <Input
               name="email"
               placeholder="Write your email..."
               value={email}
               onChange={(e) => {
-                setEmail(e.target.value);
-                setErrors((prev) => ({ ...prev, email: validateEmail(email) }));
+                const val = e.target.value;
+                setEmail(val);
+                setErrors((prev) => ({ ...prev, email: validateEmail(val) }));
               }}
             />
-            <Typography variant="inherit" color="error" height={'20px'}>
-              {errors.email && errors.email}
+            <Typography variant="inherit" color="error" height="20px">
+              {errors.email}
             </Typography>
           </Grid>
 
-          <Grid container width="100%" direction="column" alignItems={'flex-start'}>
+          <Grid container direction="column" alignItems="flex-start" width={'100%'}>
             <Typography variant="subtitle1">Password</Typography>
             <div style={{ position: 'relative', width: '100%' }}>
               <Input
@@ -73,31 +101,25 @@ export const LoginPage = () => {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => {
-                  setPassword(e.target.value);
-                  setErrors((prev) => ({ ...prev, password: validatePassword(password) }));
+                  const val = e.target.value;
+                  setPassword(val);
+                  setErrors((prev) => ({ ...prev, password: validatePassword(val) }));
                 }}
                 padding="0 40px 0 0"
               />
               <IconButton
                 onClick={() => setShowPassword((prev) => !prev)}
-                style={{
-                  position: 'absolute',
-                  right: 0,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                }}
+                sx={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)' }}
               >
                 {showPassword ? <VisibilityOff /> : <Visibility />}
               </IconButton>
             </div>
-            <Typography variant="inherit" color="error" height={'20px'}>
-              {errors.password && errors.password}
+            <Typography variant="inherit" color="error" height="20px">
+              {errors.password}
             </Typography>
           </Grid>
 
-          <Button type="submit" style={{ marginTop: 24 }}>
-            Login
-          </Button>
+          <Button type="submit">Login</Button>
         </LoginBox>
       </form>
     </Wrapper>
