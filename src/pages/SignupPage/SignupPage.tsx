@@ -8,8 +8,6 @@ import {
   Typography,
   IconButton,
   FormControl,
-  InputLabel,
-  Select,
   MenuItem,
   SelectChangeEvent,
   Checkbox,
@@ -22,6 +20,10 @@ import {
   SmallInputBox,
   RegistrationBoxField,
   RegistrationButton,
+  CountryLabel,
+  CountrySelect,
+  CountryInput,
+  CountryMenuPaper,
 } from './style';
 import {
   validateEmail,
@@ -442,57 +444,16 @@ export const SignupPage = () => {
                   sx={{ m: 1, width: '100%', margin: 0 }}
                   error={!!errors.country}
                 >
-                  <InputLabel
-                    sx={{
-                      color: '#fff',
-                      fontWeight: 400,
-                      '&.Mui-focused': {
-                        color: '#fff',
-                      },
-                      '&.Mui-error': {
-                        color: '#fff',
-                      },
-                    }}
-                  >
-                    Country
-                  </InputLabel>
-                  <Select
+                  <CountryLabel>Country</CountryLabel>
+                  <CountrySelect
                     name="country"
                     value={country}
                     onChange={handleCountryChange}
                     label="Country"
+                    input={<CountryInput />}
                     MenuProps={{
-                      PaperProps: {
-                        sx: {
-                          backgroundColor: '#fff',
-                          '& .MuiMenuItem-root': {
-                            color: '#000',
-                          },
-                        },
-                      },
+                      PaperProps: { component: CountryMenuPaper },
                     }}
-                    input={
-                      <Input
-                        sx={{
-                          '& .MuiSelect-select': {
-                            alignItems: 'flex-start',
-                            paddingTop: '6px',
-                            paddingBottom: '4px',
-                            display: 'flex',
-                          },
-                          color: '#fff',
-                          '&:before': {
-                            borderBottom: '1px solid #aaa',
-                          },
-                          '&:hover:not(.Mui-disabled, .Mui-error):before': {
-                            borderBottom: '1px solid #fff',
-                          },
-                          '&:after': {
-                            borderBottom: '1px solid #fff',
-                          },
-                        }}
-                      />
-                    }
                   >
                     <MenuItem value="">
                       <em style={{ color: '#000' }}>None</em>
@@ -502,7 +463,7 @@ export const SignupPage = () => {
                         {label}
                       </MenuItem>
                     ))}
-                  </Select>
+                  </CountrySelect>
                 </FormControl>
 
                 <Typography
@@ -619,57 +580,16 @@ export const SignupPage = () => {
                   sx={{ m: 1, width: '100%', margin: 0 }}
                   error={!!errors.countryShipping}
                 >
-                  <InputLabel
-                    sx={{
-                      color: '#fff',
-                      fontWeight: 400,
-                      '&.Mui-focused': {
-                        color: '#fff',
-                      },
-                      '&.Mui-error': {
-                        color: '#fff',
-                      },
-                    }}
-                  >
-                    Country
-                  </InputLabel>
-                  <Select
+                  <CountryLabel>Country</CountryLabel>
+                  <CountrySelect
                     name="countryShipping"
                     value={countryShipping}
                     onChange={handleCountryShippingChange}
                     label="Country"
+                    input={<CountryInput />}
                     MenuProps={{
-                      PaperProps: {
-                        sx: {
-                          backgroundColor: '#fff',
-                          '& .MuiMenuItem-root': {
-                            color: '#000',
-                          },
-                        },
-                      },
+                      PaperProps: { component: CountryMenuPaper },
                     }}
-                    input={
-                      <Input
-                        sx={{
-                          '& .MuiSelect-select': {
-                            alignItems: 'flex-start',
-                            paddingTop: '6px',
-                            paddingBottom: '4px',
-                            display: 'flex',
-                          },
-                          color: '#fff',
-                          '&:before': {
-                            borderBottom: '1px solid #aaa',
-                          },
-                          '&:hover:not(.Mui-disabled, .Mui-error):before': {
-                            borderBottom: '1px solid #fff',
-                          },
-                          '&:after': {
-                            borderBottom: '1px solid #fff',
-                          },
-                        }}
-                      />
-                    }
                   >
                     <MenuItem value="">
                       <em style={{ color: '#000' }}>None</em>
@@ -679,7 +599,7 @@ export const SignupPage = () => {
                         {label}
                       </MenuItem>
                     ))}
-                  </Select>
+                  </CountrySelect>
                 </FormControl>
 
                 <Typography
