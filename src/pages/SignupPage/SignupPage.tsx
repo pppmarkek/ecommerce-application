@@ -48,6 +48,7 @@ import type { CustomerDraft } from '@commercetools/platform-sdk';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store';
 import { fetchMe } from '@/store/userSlice';
+import countries from './countries.json';
 
 export const SignupPage = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -496,56 +497,11 @@ export const SignupPage = () => {
                     <MenuItem value="">
                       <em style={{ color: '#000' }}>None</em>
                     </MenuItem>
-                    <MenuItem value="ae">United Arab Emirates</MenuItem>
-                    <MenuItem value="ar">Argentina</MenuItem>
-                    <MenuItem value="at">Austria</MenuItem>
-                    <MenuItem value="au">Australia</MenuItem>
-                    <MenuItem value="be">Belgium</MenuItem>
-                    <MenuItem value="br">Brazil</MenuItem>
-                    <MenuItem value="ca">Canada</MenuItem>
-                    <MenuItem value="ch">Switzerland</MenuItem>
-                    <MenuItem value="cl">Chile</MenuItem>
-                    <MenuItem value="cn">China</MenuItem>
-                    <MenuItem value="co">Colombia</MenuItem>
-                    <MenuItem value="cz">Czech Republic</MenuItem>
-                    <MenuItem value="de">Germany</MenuItem>
-                    <MenuItem value="dk">Denmark</MenuItem>
-                    <MenuItem value="eg">Egypt</MenuItem>
-                    <MenuItem value="es">Spain</MenuItem>
-                    <MenuItem value="fi">Finland</MenuItem>
-                    <MenuItem value="fr">France</MenuItem>
-                    <MenuItem value="gb">United Kingdom</MenuItem>
-                    <MenuItem value="gr">Greece</MenuItem>
-                    <MenuItem value="ie">Ireland</MenuItem>
-                    <MenuItem value="il">Israel</MenuItem>
-                    <MenuItem value="in">India</MenuItem>
-                    <MenuItem value="id">Indonesia</MenuItem>
-                    <MenuItem value="it">Italy</MenuItem>
-                    <MenuItem value="jp">Japan</MenuItem>
-                    <MenuItem value="ke">Kenya</MenuItem>
-                    <MenuItem value="kr">South Korea</MenuItem>
-                    <MenuItem value="lv">Latvia</MenuItem>
-                    <MenuItem value="ma">Morocco</MenuItem>
-                    <MenuItem value="mx">Mexico</MenuItem>
-                    <MenuItem value="my">Malaysia</MenuItem>
-                    <MenuItem value="ng">Nigeria</MenuItem>
-                    <MenuItem value="nl">Netherlands</MenuItem>
-                    <MenuItem value="no">Norway</MenuItem>
-                    <MenuItem value="nz">New Zealand</MenuItem>
-                    <MenuItem value="pe">Peru</MenuItem>
-                    <MenuItem value="ph">Philippines</MenuItem>
-                    <MenuItem value="pl">Poland</MenuItem>
-                    <MenuItem value="pt">Portugal</MenuItem>
-                    <MenuItem value="ru">Russia</MenuItem>
-                    <MenuItem value="sa">Saudi Arabia</MenuItem>
-                    <MenuItem value="se">Sweden</MenuItem>
-                    <MenuItem value="sg">Singapore</MenuItem>
-                    <MenuItem value="th">Thailand</MenuItem>
-                    <MenuItem value="tr">Turkey</MenuItem>
-                    <MenuItem value="ua">Ukraine</MenuItem>
-                    <MenuItem value="us">United States</MenuItem>
-                    <MenuItem value="vn">Vietnam</MenuItem>
-                    <MenuItem value="za">South Africa</MenuItem>
+                    {countries.map(({ code, label }) => (
+                      <MenuItem key={code} value={code}>
+                        {label}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
 
@@ -718,56 +674,11 @@ export const SignupPage = () => {
                     <MenuItem value="">
                       <em style={{ color: '#000' }}>None</em>
                     </MenuItem>
-                    <MenuItem value="ae">United Arab Emirates</MenuItem>
-                    <MenuItem value="ar">Argentina</MenuItem>
-                    <MenuItem value="at">Austria</MenuItem>
-                    <MenuItem value="au">Australia</MenuItem>
-                    <MenuItem value="be">Belgium</MenuItem>
-                    <MenuItem value="br">Brazil</MenuItem>
-                    <MenuItem value="ca">Canada</MenuItem>
-                    <MenuItem value="ch">Switzerland</MenuItem>
-                    <MenuItem value="cl">Chile</MenuItem>
-                    <MenuItem value="cn">China</MenuItem>
-                    <MenuItem value="co">Colombia</MenuItem>
-                    <MenuItem value="cz">Czech Republic</MenuItem>
-                    <MenuItem value="de">Germany</MenuItem>
-                    <MenuItem value="dk">Denmark</MenuItem>
-                    <MenuItem value="eg">Egypt</MenuItem>
-                    <MenuItem value="es">Spain</MenuItem>
-                    <MenuItem value="fi">Finland</MenuItem>
-                    <MenuItem value="fr">France</MenuItem>
-                    <MenuItem value="gb">United Kingdom</MenuItem>
-                    <MenuItem value="gr">Greece</MenuItem>
-                    <MenuItem value="ie">Ireland</MenuItem>
-                    <MenuItem value="il">Israel</MenuItem>
-                    <MenuItem value="in">India</MenuItem>
-                    <MenuItem value="id">Indonesia</MenuItem>
-                    <MenuItem value="it">Italy</MenuItem>
-                    <MenuItem value="jp">Japan</MenuItem>
-                    <MenuItem value="ke">Kenya</MenuItem>
-                    <MenuItem value="kr">South Korea</MenuItem>
-                    <MenuItem value="lv">Latvia</MenuItem>
-                    <MenuItem value="ma">Morocco</MenuItem>
-                    <MenuItem value="mx">Mexico</MenuItem>
-                    <MenuItem value="my">Malaysia</MenuItem>
-                    <MenuItem value="ng">Nigeria</MenuItem>
-                    <MenuItem value="nl">Netherlands</MenuItem>
-                    <MenuItem value="no">Norway</MenuItem>
-                    <MenuItem value="nz">New Zealand</MenuItem>
-                    <MenuItem value="pe">Peru</MenuItem>
-                    <MenuItem value="ph">Philippines</MenuItem>
-                    <MenuItem value="pl">Poland</MenuItem>
-                    <MenuItem value="pt">Portugal</MenuItem>
-                    <MenuItem value="ru">Russia</MenuItem>
-                    <MenuItem value="sa">Saudi Arabia</MenuItem>
-                    <MenuItem value="se">Sweden</MenuItem>
-                    <MenuItem value="sg">Singapore</MenuItem>
-                    <MenuItem value="th">Thailand</MenuItem>
-                    <MenuItem value="tr">Turkey</MenuItem>
-                    <MenuItem value="ua">Ukraine</MenuItem>
-                    <MenuItem value="us">United States</MenuItem>
-                    <MenuItem value="vn">Vietnam</MenuItem>
-                    <MenuItem value="za">South Africa</MenuItem>
+                    {countries.map(({ code, label }) => (
+                      <MenuItem key={code} value={code}>
+                        {label}
+                      </MenuItem>
+                    ))}
                   </Select>
                 </FormControl>
 
