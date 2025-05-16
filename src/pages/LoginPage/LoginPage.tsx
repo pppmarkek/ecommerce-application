@@ -9,6 +9,7 @@ import { loginCustomer } from '@/services/api';
 import { useDispatch } from 'react-redux';
 import { fetchMe } from '@/store/userSlice';
 import { AppDispatch } from '@/store';
+import { validateEmail, validatePassword } from '../../utils/validation';
 
 export const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -17,22 +18,6 @@ export const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-
-  const validateEmail = (email: string) => {
-    if (!email.trim()) return 'Email is required.';
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) return 'Invalid email format.';
-    return '';
-  };
-
-  const validatePassword = (password: string) => {
-    if (!password.trim()) return 'Password is required.';
-    if (password.length < 8) return 'Password must be at least 8 characters.';
-    if (!/[A-Z]/.test(password)) return 'Password must contain an uppercase letter.';
-    if (!/[a-z]/.test(password)) return 'Password must contain a lowercase letter.';
-    if (!/[0-9]/.test(password)) return 'Password must contain a digit.';
-    return '';
-  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
