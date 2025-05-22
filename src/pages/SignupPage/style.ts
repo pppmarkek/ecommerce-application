@@ -5,7 +5,7 @@ export const Wrapper = styled(Grid)`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   padding: 20px 0;
 `;
 
