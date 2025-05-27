@@ -13,7 +13,16 @@
   },
   "settings": {
     "react": { "version": "detect" },
-    "import/resolver": { "typescript": {} }
+    "import/resolver": {
+      "typescript": {
+        "alwaysTryTypes": true,
+        "project": "./tsconfig.json"
+      },
+      "alias": {
+        "map": [["@", "./src"]],
+        "extensions": [".ts", ".tsx", ".js", ".jsx", ".json"]
+      }
+    }
   },
   "extends": [
     "eslint:recommended",
