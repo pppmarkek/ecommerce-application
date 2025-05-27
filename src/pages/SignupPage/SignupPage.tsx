@@ -251,7 +251,7 @@ export const SignupPage = () => {
             <Grid width={'350px'}>
               <Typography variant="h4">SingUp</Typography>
               <Typography variant="inherit" color="error" minHeight="20px" width={'100%'}>
-                {errors.singUp}
+                {errors.signUp}
               </Typography>
               <Grid container direction="column" alignItems="flex-start" width={'100%'}>
                 <Typography variant="subtitle1">Email</Typography>
