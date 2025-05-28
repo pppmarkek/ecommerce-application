@@ -249,7 +249,10 @@ export const SignupPage = () => {
         <RegistrationBox container>
           <RegistrationBoxField container>
             <Grid width={'350px'}>
-              <Typography variant="h4">SingUp</Typography>
+              <Grid marginBottom={'20px'}>
+                <Typography variant="h4">SingUp</Typography>
+              </Grid>
+
               <Grid container direction="column" alignItems="flex-start" width={'100%'}>
                 <Typography variant="subtitle1">Email</Typography>
                 <Input
