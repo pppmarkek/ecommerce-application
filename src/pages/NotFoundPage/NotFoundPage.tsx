@@ -1,7 +1,7 @@
 import { Box, Typography, Link } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 
-const NotFoundPage = () => {
+export function NotFoundPage() {
   const navigate = useNavigate();
 
   return (
@@ -29,6 +29,4 @@ const NotFoundPage = () => {
       </Typography>
     </Box>
   );
-};
-
-export default NotFoundPage;
+}

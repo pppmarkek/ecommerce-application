@@ -3,6 +3,7 @@ import { Route, Routes } from 'react-router-dom';
 import { LoginPage } from './pages/LoginPage/LoginPage';
 import { SignupPage } from './pages/SignupPage/SignupPage';
 import { HomePage } from './pages/HomePage/HomePage';
+import { NotFoundPage } from './pages/NotFoundPage/NotFoundPage';
 import { PublicRoute } from './routes/PublicRoute';
 import { PrivateRoute } from './routes/PrivateRoute';
 
@@ -32,6 +33,15 @@ function App() {
           element={
             <PublicRoute>
               <SignupPage />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="*"
+          element={
+            <PublicRoute>
+              <NotFoundPage />
             </PublicRoute>
           }
         />

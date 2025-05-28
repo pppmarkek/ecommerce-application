@@ -1,4 +1,4 @@
-import NotFoundPage from '@/pages/NotFoundPage/NotFoundPage';
+import { NotFoundPage } from '@/pages/NotFoundPage/NotFoundPage';
 import { ReactNode } from 'react';
 
 interface PrivateRouteProps {

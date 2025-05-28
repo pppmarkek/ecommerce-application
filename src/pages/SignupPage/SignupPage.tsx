@@ -250,9 +250,6 @@ export const SignupPage = () => {
           <RegistrationBoxField container>
             <Grid width={'350px'}>
               <Typography variant="h4">SingUp</Typography>
-              <Typography variant="inherit" color="error" minHeight="20px" width={'100%'}>
-                {errors.signUp}
-              </Typography>
               <Grid container direction="column" alignItems="flex-start" width={'100%'}>
                 <Typography variant="subtitle1">Email</Typography>
                 <Input
@@ -686,6 +683,9 @@ export const SignupPage = () => {
           </RegistrationBoxField>
 
           <RegistrationButton container>
+            <Typography variant="inherit" color="error" minHeight="20px" width={'100%'}>
+              {errors.signUp}
+            </Typography>
             <Button width="100%" type="submit">
               SingUp
             </Button>
