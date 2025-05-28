@@ -1,15 +1,31 @@
+import React, { Suspense, lazy } from 'react';
 import './App.css';
 import { Route, Routes } from 'react-router-dom';
-import { LoginPage } from './pages/LoginPage/LoginPage';
-import { SignupPage } from './pages/SignupPage/SignupPage';
-import { HomePage } from './pages/HomePage/HomePage';
-import { NotFoundPage } from './pages/NotFoundPage/NotFoundPage';
 import { PublicRoute } from './routes/PublicRoute';
 import { PrivateRoute } from './routes/PrivateRoute';
+import { CircularProgress, Box } from '@mui/material';
+
+const HomePage = lazy(() => import('./pages/HomePage/HomePage'));
+const LoginPage = lazy(() => import('./pages/LoginPage/LoginPage'));
+const SignupPage = lazy(() => import('./pages/SignupPage/SignupPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage/NotFoundPage'));
 
 function App() {
   return (
-    <div className="App">
+    <Suspense
+      fallback={
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      }
+    >
       <Routes>
         <Route
           path="/"
@@ -19,7 +35,6 @@ function App() {
             </PrivateRoute>
           }
         />
-
         <Route
           path="/login"
           element={
@@ -36,7 +51,6 @@ function App() {
             </PublicRoute>
           }
         />
-
         <Route
           path="*"
           element={
@@ -46,7 +60,7 @@ function App() {
           }
         />
       </Routes>
-    </div>
+    </Suspense>
   );
 }
 

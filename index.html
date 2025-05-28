@@ -4,12 +4,31 @@
     <meta charset="UTF-8" />
     <link rel="icon" href="/ecomm.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap"
-      rel="stylesheet"
+      rel="preload"
+      href="https://fonts.googleapis.com/css2?family=Loto:wght@400;500;700&display=swap"
+      as="style"
+      onload="this.onload=null;this.rel='stylesheet'"
     />
+    <noscript>
+      <link
+        href="https://fonts.googleapis.com/css2?family=Loto:wght@400;500;700&display=swap"
+        rel="stylesheet"
+      />
+    </noscript>
+
+    <link rel="preconnect" href="https://storage.googleapis.com" crossorigin />
+    <link
+      rel="preload"
+      as="image"
+      href="https://storage.googleapis.com/merchant-center-europe/sample-data/b2c-lifestyle/Luxe_Pillow_Cover-1.1.jpeg?width=260&height=250&fit=crop&format=webp"
+      imagesrcset="
+    https://storage.googleapis.com/…/Luxe_Pillow_Cover-1.1.jpeg?width=260&height=250&fit=crop&format=webp 1x,
+    https://storage.googleapis.com/…/Luxe_Pillow_Cover-1.1.jpeg?width=520&height=500&fit=crop&format=webp 2x
+  "
+      fetchpriority="high"
+    />
+
     <title>E-Comm App</title>
   </head>
   <body>

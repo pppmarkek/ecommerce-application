@@ -52,7 +52,7 @@ import { AppDispatch } from '@/store';
 import { fetchMe } from '@/store/userSlice';
 import countries from './countries.json';
 
-export const SignupPage = () => {
+export default function SignupPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [country, setCountry] = useState<string>('');
   const [countryShipping, setCountryShipping] = useState<string>('');
@@ -698,4 +698,4 @@ export const SignupPage = () => {
       </form>
     </Wrapper>
   );
-};
+}

@@ -10,6 +10,7 @@ import {
   NewPrice,
 } from './style';
 import { useNavigate } from 'react-router-dom';
+import { useInView } from 'react-intersection-observer';
 
 interface ProductContainerProps {
   id: string;
@@ -21,7 +22,7 @@ interface ProductContainerProps {
   discountedPrice?: number;
 }
 
-export const ProductContainer = React.memo(function ProductContainer({
+const ProductContainer = React.memo(function ProductContainer({
   id,
   title,
   img,
@@ -30,13 +31,25 @@ export const ProductContainer = React.memo(function ProductContainer({
   smallDescription,
   discountedPrice,
 }: ProductContainerProps) {
-  if (title === 'Luxe Pillow Cover') discountedPrice = 50;
-  const hasDiscount = discountedPrice !== undefined && discountedPrice < price;
   const navigate = useNavigate();
+  const hasDiscount = discountedPrice !== undefined && discountedPrice < price;
+  const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
+
+  const base = img.split('&format=')[0];
+  const avifSrc = `${base}&format=avif`;
+  const webpSrc = `${base}&format=webp`;
+  const jpegSrc = base;
 
   return (
-    <Wrapper hasDiscount={hasDiscount} onClick={() => navigate(`/product/${id}`)}>
-      <ImageContainer src={img} alt={title} loading="lazy" />
+    <Wrapper hasDiscount={hasDiscount} onClick={() => navigate(`/product/${id}`)} ref={ref}>
+      {inView && (
+        <picture>
+          <source type="image/avif" srcSet={avifSrc} />
+          <source type="image/webp" srcSet={webpSrc} />
+          <ImageContainer src={jpegSrc} alt={title} loading="lazy" width={260} height={250} />
+        </picture>
+      )}
+
       <TextWrapper>
         <Title variant="h6" gutterBottom>
           {title}
@@ -44,7 +57,7 @@ export const ProductContainer = React.memo(function ProductContainer({
         <Description variant="body2">{smallDescription}</Description>
 
         {hasDiscount ? (
-          <Grid container alignItems={'center'} gap={'10px'}>
+          <Grid container alignItems="center" gap="10px">
             <OldPrice variant="subtitle2">
               {price} {currencyCode}
             </OldPrice>
@@ -61,3 +74,5 @@ export const ProductContainer = React.memo(function ProductContainer({
     </Wrapper>
   );
 });
+
+export default ProductContainer;

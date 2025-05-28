@@ -35,13 +35,13 @@ interface Props {
   onReset: () => void;
 }
 
-export const FilterSidebar: React.FC<Props> = ({
+export default function FilterSidebar({
   options,
   selectedFilters,
   priceRange,
   onChange,
   onReset,
-}) => {
+}: Props) {
   const [open, setOpen] = useState<Record<string, boolean>>({
     price: true,
     brand: true,
@@ -158,4 +158,4 @@ export const FilterSidebar: React.FC<Props> = ({
       </Box>
     </Box>
   );
-};
+}

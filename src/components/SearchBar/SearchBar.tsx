@@ -8,10 +8,12 @@ interface Props {
   onSearch: (q: string) => void;
 }
 
-export const SearchBar: React.FC<Props> = React.memo(function SearchBar({ value, onSearch }) {
+const SearchBar: React.FC<Props> = React.memo(function SearchBar({ value, onSearch }) {
   const [text, setText] = useState(value);
 
-  useEffect(() => setText(value), [value]);
+  useEffect(() => {
+    setText(value);
+  }, [value]);
 
   const submit = () => onSearch(text.trim());
 
@@ -35,3 +37,5 @@ export const SearchBar: React.FC<Props> = React.memo(function SearchBar({ value,
     />
   );
 });
+
+export default SearchBar;

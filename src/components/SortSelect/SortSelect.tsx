@@ -14,7 +14,7 @@ const OPTIONS = [
   { v: 'name.en desc', label: 'Name: Z → A' },
 ] as const;
 
-export const SortSelect: React.FC<Props> = React.memo(function SortSelect({ value, onChange }) {
+const SortSelect: React.FC<Props> = React.memo(function SortSelect({ value, onChange }) {
   return (
     <StyledFormControl variant="outlined">
       <StyledInputLabel id="sort-label">Sort By</StyledInputLabel>
@@ -48,3 +48,5 @@ export const SortSelect: React.FC<Props> = React.memo(function SortSelect({ valu
     </StyledFormControl>
   );
 });
+
+export default SortSelect;

@@ -9,7 +9,7 @@ interface Props {
   onSelect: (id: string | null) => void;
 }
 
-export const CategorySidebar: React.FC<Props> = ({ tree, selectedId, onSelect }) => {
+export default function CategorySidebar({ tree, selectedId, onSelect }: Props) {
   const [openIds, setOpenIds] = React.useState<Set<string>>(new Set());
 
   const toggle = (id: string) => {
@@ -47,4 +47,4 @@ export const CategorySidebar: React.FC<Props> = ({ tree, selectedId, onSelect })
   );
 
   return <List>{tree.map((root) => renderNode(root))}</List>;
-};
+}

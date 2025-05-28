@@ -11,7 +11,7 @@ import { fetchMe } from '@/store/userSlice';
 import { AppDispatch } from '@/store';
 import { validateEmail, validatePassword } from '../../utils/validation';
 
-export const LoginPage = () => {
+export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string; login?: string }>({});
@@ -114,4 +114,4 @@ export const LoginPage = () => {
       </form>
     </Wrapper>
   );
-};
+}

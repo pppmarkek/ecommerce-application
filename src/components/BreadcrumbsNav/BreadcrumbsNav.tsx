@@ -7,7 +7,7 @@ interface Props {
   onSelect: (id: string | null) => void;
 }
 
-export const BreadcrumbsNav: React.FC<Props> = ({ trail, onSelect }) => {
+export default function BreadcrumbsNav({ trail, onSelect }: Props) {
   if (trail.length === 0) return null;
   return (
     <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
@@ -28,4 +28,4 @@ export const BreadcrumbsNav: React.FC<Props> = ({ trail, onSelect }) => {
       })}
     </Breadcrumbs>
   );
-};
+}
