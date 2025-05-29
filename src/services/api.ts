@@ -170,3 +170,20 @@ export async function getAllCategories(): Promise<Category[]> {
   }
   return all;
 }
+
+export async function getProductById(id: string): Promise<Product> {
+  const projectKey = import.meta.env.VITE_CT_PROJECT_KEY;
+  const apiHost = import.meta.env.VITE_CT_API_URL;
+  const token = await getServiceToken([`view_products:${projectKey}`]);
+  const url = `${apiHost}/${projectKey}/products/${id}`;
+
+  const resp = await axios.get<Product>(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (resp.status !== 200) {
+    const err = resp.data as unknown as ErrorResponse;
+    throw new Error(err.error_description ?? err.message ?? `Failed to fetch product ${id}`);
+  }
+  return resp.data;
+}

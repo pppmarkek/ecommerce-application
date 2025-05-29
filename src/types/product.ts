@@ -77,6 +77,7 @@ export interface Image {
     w: number;
     h: number;
   };
+  label?: string;
 }
 
 export interface Attribute {
