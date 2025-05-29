@@ -1,7 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Typography, CircularProgress } from '@mui/material';
-import { Wrapper, ProductBox, ProductBoxTopSide } from './style';
+import { Typography, CircularProgress, Grid } from '@mui/material';
+import {
+  Wrapper,
+  ProductBox,
+  ProductBoxTopSide,
+  ImageContainer,
+  ProductDescription,
+} from './style';
 import { getProductById } from '../../services/api';
 import { Product } from '@/types/product';
 
@@ -47,31 +53,26 @@ export default function ProductPage() {
   const images = masterVariant.images;
 
   return (
-    <Wrapper>
+    <Wrapper container>
       <ProductBox container>
-        <ProductBoxTopSide>
-          <Box>
+        <ProductBoxTopSide container>
+          <Grid>
             {images.map((img, idx) => (
-              <Box key={idx}>
-                <img
-                  src={img.url}
-                  alt={img.label ?? name[locale]}
-                  style={{ width: '100%', borderRadius: 8 }}
-                />
-              </Box>
+              <Grid key={idx}>
+                <ImageContainer src={img.url} alt={img.label ?? name[locale]} />
+              </Grid>
             ))}
-          </Box>
-
-          <Box>
+          </Grid>
+          <Grid>
             <Typography variant="h4" gutterBottom>
               {name[locale]}
             </Typography>
-          </Box>
+          </Grid>
         </ProductBoxTopSide>
-        <Box>
+        <ProductDescription container>
           <Typography variant="h4">Description</Typography>
           <Typography variant="body1">{description[locale]}</Typography>
-        </Box>
+        </ProductDescription>
       </ProductBox>
     </Wrapper>
   );
