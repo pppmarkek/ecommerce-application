@@ -9,6 +9,7 @@ const HomePage = lazy(() => import('./pages/HomePage/HomePage'));
 const LoginPage = lazy(() => import('./pages/LoginPage/LoginPage'));
 const SignupPage = lazy(() => import('./pages/SignupPage/SignupPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage/NotFoundPage'));
+const ProductPage = lazy(() => import('./pages/ProductPage/ProductPage'));
 
 function App() {
   return (
@@ -48,6 +49,14 @@ function App() {
           element={
             <PublicRoute>
               <SignupPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/product/:id"
+          element={
+            <PublicRoute>
+              <ProductPage />
             </PublicRoute>
           }
         />
