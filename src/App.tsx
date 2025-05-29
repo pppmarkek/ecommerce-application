@@ -55,9 +55,9 @@ function App() {
         <Route
           path="/product/:id"
           element={
-            <PublicRoute>
+            <PrivateRoute>
               <ProductPage />
-            </PublicRoute>
+            </PrivateRoute>
           }
         />
         <Route
