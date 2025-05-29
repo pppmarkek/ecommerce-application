@@ -34,6 +34,18 @@ const ProductContainer = React.memo(function ProductContainer({
   const navigate = useNavigate();
   const hasDiscount = discountedPrice !== undefined && discountedPrice < price;
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
+  const original = price / 100;
+  const saleMajor = hasDiscount ? discountedPrice! / 100 : undefined;
+
+  const fmt = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currencyCode,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+
+  const formattedOriginal = fmt.format(original);
+  const formattedSale = hasDiscount ? fmt.format(saleMajor!) : undefined;
 
   const base = img.split('&format=')[0];
   const avifSrc = `${base}&format=avif`;
@@ -58,17 +70,11 @@ const ProductContainer = React.memo(function ProductContainer({
 
         {hasDiscount ? (
           <Grid container alignItems="center" gap="10px">
-            <OldPrice variant="subtitle2">
-              {price} {currencyCode}
-            </OldPrice>
-            <NewPrice variant="subtitle1">
-              {discountedPrice} {currencyCode}
-            </NewPrice>
+            <OldPrice variant="subtitle2">{formattedOriginal}</OldPrice>
+            <NewPrice variant="subtitle1">{formattedSale}</NewPrice>
           </Grid>
         ) : (
-          <Typography variant="subtitle1">
-            {price} {currencyCode}
-          </Typography>
+          <Typography variant="subtitle1">{formattedOriginal}</Typography>
         )}
       </TextWrapper>
     </Wrapper>
