@@ -49,8 +49,22 @@ export default function ProductPage() {
     );
   }
 
-  const { name, description, masterVariant } = product.masterData.current;
-  const images = masterVariant.images;
+  const {
+    name,
+    description,
+    masterVariant: { images, prices },
+  } = product.masterData.current;
+
+  const priceEntry = prices[0];
+  const original = priceEntry.value.centAmount / 100;
+  const hasSale = Boolean(priceEntry.discounted);
+  const sale = hasSale ? priceEntry.discounted!.value.centAmount / 100 : undefined;
+
+  const fmt = new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: priceEntry.value.currencyCode,
+    minimumFractionDigits: 2,
+  });
 
   return (
     <Wrapper container>
@@ -67,6 +81,18 @@ export default function ProductPage() {
             <Typography variant="h4" gutterBottom>
               {name[locale]}
             </Typography>
+            <Typography
+              variant={hasSale ? 'subtitle1' : 'h5'}
+              sx={{ textDecoration: hasSale ? 'line-through' : 'none' }}
+            >
+              {fmt.format(original)}
+            </Typography>
+
+            {hasSale && (
+              <Typography variant="h5" color="error">
+                {fmt.format(sale!)}
+              </Typography>
+            )}
           </Grid>
         </ProductBoxTopSide>
         <ProductDescription container>

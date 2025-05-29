@@ -57,11 +57,17 @@ export interface ProductVariant {
   availability: Availability;
 }
 
+export interface DiscountedPrice {
+  value: Money;
+  discount: { id: string; obj: number };
+}
+
 export interface Price {
   id: string;
   value: Money;
   key: string;
   country: string;
+  discounted?: DiscountedPrice;
 }
 
 export interface Money {
