@@ -5,6 +5,7 @@ import { Product, ProductVariant, LocalizedString } from '@/types/product';
 import { PageLayout, Content, Sidebar, ProductGrid } from './style';
 import { buildCategoryMapFromList, buildCategoryTree, buildTrail } from '@/utils/categoryTree';
 import { Button } from '@/components/Button/Button';
+import { CategoryNode } from '@/types/category';
 
 const CategorySidebar = lazy(() => import('@/components/CategorySidebar/CategorySidebar'));
 const FilterSidebar = lazy(() => import('@/components/FilterSidebar/FilterSidebar'));
@@ -30,6 +31,7 @@ interface Projection {
   description?: LocalizedString;
   masterVariant: ProductVariant;
   variants: ProductVariant[];
+  categories: { id: string }[];
 }
 
 type Item = Product | Projection;
@@ -54,6 +56,7 @@ export default function HomePage(): JSX.Element {
   const [total, setTotal] = useState<number>(0);
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [allItems, setAllItems] = useState<Item[]>([]);
 
   const [selectedCategoryId, setSelectedCategoryId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -64,7 +67,8 @@ export default function HomePage(): JSX.Element {
     brand: string[];
     color: string[];
     size: string[];
-  }>({ brand: [], color: [], size: [] });
+    finish: string[];
+  }>({ brand: [], color: [], size: [], finish: [] });
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 0]);
   const [pageIndex, setPageIndex] = useState<number>(0);
 
@@ -74,6 +78,20 @@ export default function HomePage(): JSX.Element {
     () => buildTrail(categoryMap, selectedCategoryId),
     [categoryMap, selectedCategoryId],
   );
+
+  useEffect(() => {
+    async function fetchAllProducts() {
+      try {
+        const firstPage = await getAllProducts({ offset: 0, limit: 1 });
+        const totalCount = firstPage.total;
+        const resp = await getAllProducts({ offset: 0, limit: totalCount });
+        setAllItems(resp.results as Item[]);
+      } catch (err) {
+        console.error('Failed to load all products for filters', err);
+      }
+    }
+    fetchAllProducts();
+  }, []);
 
   useEffect(() => {
     getAllCategories()
@@ -90,6 +108,7 @@ export default function HomePage(): JSX.Element {
         categoryId: selectedCategoryId ?? undefined,
         sort: sortOrder.startsWith('name.') && !searchQuery ? sortOrder : undefined,
       });
+      console.log('Fetched products:', response);
       setItems(response.results as Item[]);
       setTotal(response.total);
     } finally {
@@ -97,45 +116,86 @@ export default function HomePage(): JSX.Element {
     }
   }, [pageIndex, pageSize, selectedCategoryId, sortOrder, searchQuery]);
 
+  const activeCategoryIds = useMemo<Set<string>>(() => {
+    const ids = new Set<string>();
+    allItems.forEach((item) => {
+      const cats = isProduct(item)
+        ? item.masterData.current.categories.map((ref) => ref.id)
+        : ((item as Projection).categories?.map((ref) => ref.id) ?? []);
+      cats.forEach((id) => ids.add(id));
+    });
+    return ids;
+  }, [allItems]);
+
+  const prunedTree = useMemo(() => {
+    function prune(nodes: CategoryNode[]): CategoryNode[] {
+      return nodes
+        .map((node) => {
+          const children = prune(node.children);
+          const hasProducts = activeCategoryIds.has(node.id);
+          if (hasProducts || children.length > 0) {
+            return { ...node, children };
+          }
+          return null;
+        })
+        .filter((n): n is CategoryNode => n !== null);
+    }
+    return prune(categoryTree);
+  }, [categoryTree, activeCategoryIds]);
+
   useEffect(() => {
     void fetchProducts();
   }, [fetchProducts]);
 
   const filterOptions = useMemo(() => {
-    const B = new Set<string>();
-    const C = new Set<string>();
-    const S = new Set<string>();
-    let min = Infinity;
-    let max = 0;
+    const brands = new Set<string>();
+    const colors = new Set<string>();
+    const sizes = new Set<string>();
+    const finishes = new Set<string>();
+    let minPrice = Infinity;
+    let maxPrice = 0;
 
-    items.forEach((item) => {
-      const v = getVariant(item);
-
-      v.attributes?.forEach((attr) => {
+    allItems.forEach((item) => {
+      const variant = getVariant(item);
+      variant.attributes?.forEach((attr) => {
         const val = pickAttr(attr.value).toLowerCase();
-        if (attr.name === 'brand') B.add(val);
-        if (attr.name === 'color') C.add(val);
-        if (attr.name === 'size') S.add(val);
+        if (attr.name === 'brand') brands.add(val);
+        if (attr.name === 'color') colors.add(val);
+        if (attr.name === 'size') sizes.add(val);
+        if (attr.name === 'finish') finishes.add(val);
       });
-
-      const cents = v.prices?.[0]?.value.centAmount ?? 0;
-      min = Math.min(min, cents);
-      max = Math.max(max, cents);
+      const cents = variant.prices?.[0]?.value.centAmount ?? 0;
+      minPrice = Math.min(minPrice, cents);
+      maxPrice = Math.max(maxPrice, cents);
     });
 
     return {
-      brand: Array.from(B).sort(),
-      color: Array.from(C).sort(),
-      size: Array.from(S).sort(),
-      minPrice: min === Infinity ? 0 : min,
-      maxPrice: max,
+      brand: Array.from(brands).sort(),
+      color: Array.from(colors).sort(),
+      size: Array.from(sizes).sort(),
+      finish: Array.from(finishes).sort(),
+      minPrice: minPrice === Infinity ? 0 : minPrice,
+      maxPrice,
     };
-  }, [items]);
+  }, [allItems]);
 
   const processedItems = useMemo<Item[]>(() => {
-    let result = [...items];
+    const source =
+      searchQuery ||
+      filters.brand.length ||
+      filters.color.length ||
+      filters.size.length ||
+      filters.finish.length
+        ? allItems
+        : items;
+    let result = [...source];
 
-    if (filters.brand.length || filters.color.length || filters.size.length) {
+    if (
+      filters.brand.length ||
+      filters.color.length ||
+      filters.size.length ||
+      filters.finish.length
+    ) {
       result = result.filter((item) => {
         const v = getVariant(item);
         const map: Record<string, string> = {};
@@ -145,6 +205,9 @@ export default function HomePage(): JSX.Element {
         if (filters.brand.length && !filters.brand.includes(map.brand ?? '')) return false;
         if (filters.color.length && !filters.color.includes(map.color ?? '')) return false;
         if (filters.size.length && !filters.size.includes(map.size ?? '')) return false;
+
+        if (filters.finish.length && !filters.finish.includes(map.finish ?? '')) return false;
+
         return true;
       });
     }
@@ -175,14 +238,31 @@ export default function HomePage(): JSX.Element {
     }
 
     return result;
-  }, [items, filters, priceRange, searchQuery, sortOrder]);
+  }, [items, allItems, filters, priceRange, searchQuery, sortOrder]);
 
-  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const activeCount =
+    searchQuery ||
+    filters.brand.length ||
+    filters.color.length ||
+    filters.size.length ||
+    filters.finish.length
+      ? processedItems.length
+      : total;
+  const totalPages = Math.max(1, Math.ceil(activeCount / pageSize));
 
   const goToPage = (next: number): void => {
     setPageIndex(next);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const displayItems =
+    searchQuery ||
+    filters.brand.length ||
+    filters.color.length ||
+    filters.size.length ||
+    filters.finish.length
+      ? processedItems.slice(pageIndex * pageSize, (pageIndex + 1) * pageSize)
+      : items;
 
   return (
     <>
@@ -194,7 +274,7 @@ export default function HomePage(): JSX.Element {
         <Sidebar>
           <Suspense fallback={<Box sx={{ p: 2 }}>Loading categories…</Box>}>
             <CategorySidebar
-              tree={categoryTree}
+              tree={prunedTree}
               selectedId={selectedCategoryId}
               onSelect={(id: string | null): void => {
                 setSelectedCategoryId(id);
@@ -209,7 +289,7 @@ export default function HomePage(): JSX.Element {
               selectedFilters={filters}
               priceRange={priceRange}
               onChange={(
-                newFilters: { brand: string[]; color: string[]; size: string[] },
+                newFilters: { brand: string[]; color: string[]; size: string[]; finish: string[] },
                 newRange: [number, number],
               ): void => {
                 setFilters(newFilters);
@@ -217,7 +297,7 @@ export default function HomePage(): JSX.Element {
                 setPageIndex(0);
               }}
               onReset={(): void => {
-                setFilters({ brand: [], color: [], size: [] });
+                setFilters({ brand: [], color: [], size: [], finish: [] });
                 setPriceRange([0, 0]);
                 setPageIndex(0);
               }}
@@ -276,7 +356,7 @@ export default function HomePage(): JSX.Element {
           ) : (
             <Suspense fallback={<Typography>Loading products…</Typography>}>
               <ProductGrid>
-                {processedItems.map((product: Item) => {
+                {displayItems.map((product: Item) => {
                   const variant = getVariant(product);
                   const imageUrl = variant.images?.[0]?.url
                     ? `${variant.images[0].url}?width=260&height=250&fit=crop&auto=compress`
@@ -291,6 +371,7 @@ export default function HomePage(): JSX.Element {
                       price={variant.prices?.[0]?.value.centAmount ?? 0}
                       currencyCode={variant.prices?.[0]?.value.currencyCode || 'USD'}
                       smallDescription={getDescription(product) || 'No description available'}
+                      discountedPrice={variant.prices?.[0]?.discounted?.value.centAmount}
                     />
                   );
                 })}

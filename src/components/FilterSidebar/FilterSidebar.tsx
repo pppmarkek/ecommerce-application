@@ -19,11 +19,14 @@ interface Filters {
   brand: string[];
   color: string[];
   size: string[];
+  finish: string[];
 }
+
 interface Options {
   brand: string[];
   color: string[];
   size: string[];
+  finish: string[];
   minPrice: number;
   maxPrice: number;
 }
@@ -33,6 +36,7 @@ interface Props {
   priceRange: [number, number];
   onChange: (f: Filters, p: [number, number]) => void;
   onReset: () => void;
+  currencyCode?: string;
 }
 
 export default function FilterSidebar({
@@ -41,12 +45,21 @@ export default function FilterSidebar({
   priceRange,
   onChange,
   onReset,
+  currencyCode = 'EUR',
 }: Props) {
   const [open, setOpen] = useState<Record<string, boolean>>({
     price: true,
     brand: true,
     color: true,
     size: true,
+    finish: true,
+  });
+
+  const formatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: currencyCode,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
   });
 
   const [localF, setLocalF] = useState<Filters>(selectedFilters);
@@ -77,13 +90,13 @@ export default function FilterSidebar({
   const apply = () => onChange(localF, localP);
   const reset = () => {
     onReset();
-    setLocalF({ brand: [], color: [], size: [] });
+    setLocalF({ brand: [], color: [], size: [], finish: [] });
     setLocalP([options.minPrice, options.maxPrice]);
   };
 
   const cap = (s: string) => s.replace(/\b\w/g, (c) => c.toUpperCase());
 
-  const renderColorLabel = (raw: string) => {
+  const renderSwatchLabel = (raw: string) => {
     const [namePart, hexPart] = raw.split(':');
     const hex = hexPart ? `#${hexPart.replace('#', '')}` : '#000';
     return (
@@ -115,7 +128,7 @@ export default function FilterSidebar({
               control={
                 <Checkbox checked={localF[key].includes(v)} onChange={() => handleCheck(key, v)} />
               }
-              label={key === 'color' ? renderColorLabel(v) : cap(v)}
+              label={key === 'color' || key === 'finish' ? renderSwatchLabel(v) : cap(v)}
             />
           ))}
         </Grid>
@@ -136,16 +149,19 @@ export default function FilterSidebar({
               value={localP}
               onChange={handlePrice}
               valueLabelDisplay="auto"
+              valueLabelFormat={(v) => formatter.format(v / 100)}
               min={options.minPrice}
               max={options.maxPrice}
             />
             <Typography variant="caption">
-              {localP[0]} – {localP[1]}
+              {formatter.format(localP[0] / 100)} – {formatter.format(localP[1] / 100)}
             </Typography>
           </Box>
         </Collapse>
 
         {renderGroup('Color', 'color', options.color)}
+        {renderGroup('Finish', 'finish', options.finish)}
+        {renderGroup('Size', 'size', options.size)}
       </List>
 
       <Box sx={{ mt: 2, display: 'flex', gap: 1 }}>
