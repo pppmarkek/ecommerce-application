@@ -7,9 +7,12 @@ import {
   ProductBoxTopSide,
   ImageContainer,
   ProductDescription,
+  ImageBox,
 } from './style';
 import { getProductById } from '../../services/api';
 import { Product } from '@/types/product';
+import AliceCarousel from 'react-alice-carousel';
+import 'react-alice-carousel/lib/alice-carousel.css';
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
@@ -35,7 +38,7 @@ export default function ProductPage() {
 
   if (loading) {
     return (
-      <Wrapper>
+      <Wrapper container>
         <CircularProgress />
       </Wrapper>
     );
@@ -43,7 +46,7 @@ export default function ProductPage() {
 
   if (error || !product) {
     return (
-      <Wrapper>
+      <Wrapper container>
         <Typography color="error">{error || 'Product not found.'}</Typography>
       </Wrapper>
     );
@@ -54,6 +57,23 @@ export default function ProductPage() {
     description,
     masterVariant: { images, prices },
   } = product.masterData.current;
+
+  const imagesArray = images.map((img, idx) => (
+    <Grid key={idx}>
+      <ImageContainer src={img.url} alt={img.label ?? name[locale]} />
+    </Grid>
+  ));
+
+  const renderDotsItem = ({ isActive }: { isActive?: boolean }): React.ReactNode =>
+    isActive ? 'x' : 'o';
+
+  const renderPrevButton = ({ isDisabled }: { isDisabled?: boolean }): React.ReactNode => (
+    <span style={{ opacity: isDisabled ? 0.5 : 1 }}>Prev</span>
+  );
+
+  const renderNextButton = ({ isDisabled }: { isDisabled?: boolean }): React.ReactNode => (
+    <span style={{ opacity: isDisabled ? 0.5 : 1 }}>Next</span>
+  );
 
   const priceEntry = prices[0];
   const original = priceEntry.value.centAmount / 100;
@@ -70,29 +90,34 @@ export default function ProductPage() {
     <Wrapper container>
       <ProductBox container>
         <ProductBoxTopSide container>
+          <ImageBox>
+            <AliceCarousel
+              mouseTracking
+              items={imagesArray}
+              renderDotsItem={renderDotsItem}
+              renderPrevButton={renderPrevButton}
+              renderNextButton={renderNextButton}
+            />
+          </ImageBox>
+
           <Grid>
-            {images.map((img, idx) => (
-              <Grid key={idx}>
-                <ImageContainer src={img.url} alt={img.label ?? name[locale]} />
-              </Grid>
-            ))}
-          </Grid>
-          <Grid>
-            <Typography variant="h4" gutterBottom>
+            <Typography variant="h4" sx={{ wordBreak: 'break-word' }}>
               {name[locale]}
             </Typography>
-            <Typography
-              variant={hasSale ? 'subtitle1' : 'h5'}
-              sx={{ textDecoration: hasSale ? 'line-through' : 'none' }}
-            >
-              {fmt.format(original)}
-            </Typography>
-
-            {hasSale && (
-              <Typography variant="h5" color="error">
-                {fmt.format(sale!)}
+            <Grid>
+              <Typography
+                variant={hasSale ? 'subtitle1' : 'h5'}
+                sx={{ textDecoration: hasSale ? 'line-through' : 'none' }}
+              >
+                {fmt.format(original)}
               </Typography>
-            )}
+
+              {hasSale && (
+                <Typography variant="h5" color="error">
+                  {fmt.format(sale!)}
+                </Typography>
+              )}
+            </Grid>
           </Grid>
         </ProductBoxTopSide>
         <ProductDescription container>
