@@ -8,6 +8,9 @@ import {
   ImageContainer,
   ProductDescription,
   ImageBox,
+  ModalImageBox,
+  StyledModal,
+  CloseModalButton,
 } from './style';
 import { getProductById } from '../../services/api';
 import { Product } from '@/types/product';
@@ -19,6 +22,13 @@ export default function ProductPage() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [open, setOpen] = React.useState(false);
+  const [initialSlide, setInitialSlide] = useState(0);
+  const handleOpen = (idx: number) => {
+    setInitialSlide(idx);
+    setOpen(true);
+  };
+  const handleClose = () => setOpen(false);
   const locale = 'en-US';
 
   useEffect(() => {
@@ -59,7 +69,7 @@ export default function ProductPage() {
   } = product.masterData.current;
 
   const imagesArray = images.map((img, idx) => (
-    <Grid key={idx}>
+    <Grid key={idx} onClick={() => handleOpen(idx)}>
       <ImageContainer src={img.url} alt={img.label ?? name[locale]} />
     </Grid>
   ));
@@ -125,6 +135,19 @@ export default function ProductPage() {
           <Typography variant="body1">{description[locale]}</Typography>
         </ProductDescription>
       </ProductBox>
+      <StyledModal open={open} onClose={handleClose} disableAutoFocus>
+        <ModalImageBox>
+          <CloseModalButton onClick={handleClose}>X</CloseModalButton>
+          <AliceCarousel
+            mouseTracking
+            items={imagesArray}
+            renderDotsItem={renderDotsItem}
+            renderPrevButton={renderPrevButton}
+            renderNextButton={renderNextButton}
+            activeIndex={initialSlide}
+          />
+        </ModalImageBox>
+      </StyledModal>
     </Wrapper>
   );
 }

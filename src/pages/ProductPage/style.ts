@@ -1,4 +1,4 @@
-import { styled, Grid } from '@mui/material';
+import { styled, Grid, Modal, Button } from '@mui/material';
 
 export const Wrapper = styled(Grid)`
   flex-direction: column;
@@ -13,11 +13,15 @@ export const Wrapper = styled(Grid)`
     direction: ltr;
   }
 
+  li.alice-carousel__dots-item.__custom {
+    cursor: pointer;
+  }
+
   .alice-carousel__dots {
     margin: 0px 3px 5px;
     display: flex;
     justify-content: center;
-    gap: ${({ theme }) => theme.spacing(1)};
+    gap: 1px;
   }
   .alice-carousel__next-btn {
     text-align: center;
@@ -69,5 +73,81 @@ export const ImageBox = styled(Grid)`
   height: 100%;
   @media (max-width: 1076px) {
     width: 100%;
+  }
+`;
+
+export const StyledModal = styled(Modal)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  &:focus-visible {
+    outline: none;
+  }
+`;
+
+export const ModalImageBox = styled(Grid)`
+  width: 50%;
+  background-color: rgb(83, 83, 83);
+  border-radius: 10px;
+
+  .alice-carousel__stage-item * {
+    height: 500px;
+  }
+
+  .alice-carousel__dots {
+    margin: 0px 3px 5px;
+    display: flex;
+    justify-content: center;
+    gap: 1px;
+  }
+
+  li.alice-carousel__dots-item.__custom {
+    cursor: pointer;
+  }
+  .alice-carousel__next-btn {
+    text-align: center;
+    border-radius: 5px;
+    border-radius: 10px;
+    transition: all 0.3s;
+  }
+  .alice-carousel__next-btn:hover {
+    background: #3f3f3f;
+  }
+  .alice-carousel__prev-btn {
+    text-align: center;
+    border-radius: 5px;
+    transition: all 0.3s;
+  }
+  .alice-carousel__prev-btn:hover {
+    background: #3f3f3f;
+  }
+
+  @media (max-width: 1260px) {
+    width: 70%;
+  }
+
+  @media (max-width: 1076px) {
+    width: 90%;
+  }
+  @media (max-width: 700px) {
+    width: 90%;
+    .alice-carousel__stage-item * {
+      height: 300px;
+    }
+  }
+`;
+
+export const CloseModalButton = styled(Button)`
+  position: absolute;
+  z-index: 2000;
+  right: 10px;
+  top: 10px;
+  color: white;
+  width: 15px;
+  height: 60px;
+  border-radius: 100%;
+
+  :hover {
+    background: #3f3f3f;
   }
 `;
