@@ -1,5 +1,5 @@
 import { Button } from '../Button/Button';
-import { HeaderContainer, StyledImage } from './style';
+import { HeaderContainer, StyledImage, ButtonWrapper } from './style';
 import { useNavigate } from 'react-router-dom';
 
 export function Header() {
@@ -11,6 +11,10 @@ export function Header() {
     navigate('login');
   };
 
+  const handleProfile = () => {
+    navigate('/profile');
+  };
+
   return (
     <HeaderContainer>
       <button
@@ -19,9 +23,15 @@ export function Header() {
       >
         <StyledImage src="/headerIcon.png" alt="Icon" />
       </button>
-      <Button onClick={handleLogout} width="100px">
-        Logout
-      </Button>
+
+      <ButtonWrapper>
+        <Button width="100px" onClick={handleProfile}>
+          Profile
+        </Button>
+        <Button width="100px" onClick={handleLogout}>
+          Logout
+        </Button>
+      </ButtonWrapper>
     </HeaderContainer>
   );
 }

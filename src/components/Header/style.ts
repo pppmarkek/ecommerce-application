@@ -14,3 +14,8 @@ export const StyledImage = styled('img')`
   height: 60px;
   cursor: pointer;
 `;
+
+export const ButtonWrapper = styled('div')`
+  display: flex;
+  gap: 16px;
+`;

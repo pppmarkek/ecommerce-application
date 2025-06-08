@@ -10,6 +10,7 @@ const LoginPage = lazy(() => import('./pages/LoginPage/LoginPage'));
 const SignupPage = lazy(() => import('./pages/SignupPage/SignupPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage/NotFoundPage'));
 const ProductPage = lazy(() => import('./pages/ProductPage/ProductPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage/ProfilePage'));
 
 function App() {
   return (
@@ -66,6 +67,14 @@ function App() {
             <PublicRoute>
               <NotFoundPage />
             </PublicRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <ProfilePage />
+            </PrivateRoute>
           }
         />
       </Routes>

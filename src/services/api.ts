@@ -1,5 +1,10 @@
 import axios from 'axios';
-import { CustomerDraft, Customer } from '@commercetools/platform-sdk';
+import {
+  CustomerDraft,
+  Customer,
+  CustomerUpdate,
+  CustomerUpdateAction,
+} from '@commercetools/platform-sdk';
 import { Product } from '@/types/product';
 
 export interface CustomerTokenResponse {
@@ -186,4 +191,56 @@ export async function getProductById(id: string): Promise<Product> {
     throw new Error(err.error_description ?? err.message ?? `Failed to fetch product ${id}`);
   }
   return resp.data;
+}
+
+export async function getCustomerProfileMe(accessToken: string): Promise<Customer> {
+  const projectKey = import.meta.env.VITE_CT_PROJECT_KEY;
+  const apiHost = import.meta.env.VITE_CT_API_URL;
+
+  const url = `${apiHost}/${projectKey}/me`;
+
+  const resp = await axios.get<Customer>(url, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
+  });
+
+  if (resp.status !== 200) {
+    const err = resp.data as unknown as ErrorResponse;
+    throw new Error(err.error_description ?? err.message ?? 'Failed to fetch customer profile');
+  }
+
+  return resp.data;
+}
+
+// api.ts - Düzeltilmiş editCustomerActions fonksiyonu
+
+export async function editCustomerActions(
+  version: number,
+  actions: CustomerUpdateAction[],
+  accessToken: string, // Customer token'ı parametre olarak alıyoruz
+): Promise<Customer> {
+  const projectKey = import.meta.env.VITE_CT_PROJECT_KEY;
+  const apiHost = import.meta.env.VITE_CT_API_URL;
+
+  // /me endpoint'ini kullanarak customer'ın kendi profilini güncellemesi
+  const url = `${apiHost}/${projectKey}/me`;
+
+  const response = await axios.post<Customer>(
+    url,
+    { version, actions },
+    {
+      headers: {
+        Authorization: `Bearer ${accessToken}`, // Customer token kullanıyoruz
+        'Content-Type': 'application/json',
+      },
+    },
+  );
+
+  if (response.status !== 200) {
+    const err = response.data as unknown as ErrorResponse;
+    throw new Error(err.error_description ?? err.message ?? 'Customer update failed');
+  }
+
+  return response.data;
 }
