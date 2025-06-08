@@ -52,6 +52,12 @@ import { AppDispatch } from '@/store';
 import { fetchMe } from '@/store/userSlice';
 import countries from '@/pages/SignupPage/countries.json';
 
+interface UpdateResult {
+  success: boolean;
+  field: string;
+  error?: string;
+}
+
 const EditProfileForm = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [country, setCountry] = useState<string>('');
@@ -64,6 +70,7 @@ const EditProfileForm = () => {
   const [sameAsBilling, setSameAsBilling] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const [currentPassword, setCurrentPassword] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleDefaultBilling = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDefaultBilling(e.target.checked);
@@ -131,10 +138,43 @@ const EditProfileForm = () => {
     }));
   };
 
-  // EditProfileForm.tsx - Düzeltilmiş handleSubmit fonksiyonu
+  // Individual update function for each action
+  const updateField = async (
+    actions: CustomerUpdateAction[],
+    version: number,
+    accessToken: string,
+    fieldName: string,
+  ): Promise<UpdateResult> => {
+    try {
+      const response = await editCustomerActions(version, actions, accessToken);
+      return {
+        success: true,
+        field: fieldName,
+      };
+    } catch (err) {
+      let errorMessage = 'Update failed';
+      if (axios.isAxiosError(err)) {
+        const data = err.response?.data as ErrorResponse;
+        errorMessage = data.error_description ?? data.message ?? errorMessage;
+      }
+
+      return {
+        success: false,
+        field: fieldName,
+        error: errorMessage,
+      };
+    }
+  };
+
+  // Get current version from localStorage or API
+  const getCurrentVersion = (): number => {
+    const versionString = localStorage.getItem('version');
+    return versionString ? parseInt(versionString, 10) : 1;
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setIsSubmitting(true);
 
     const formValues = Object.fromEntries(new FormData(event.currentTarget).entries()) as Record<
       | 'email'
@@ -169,7 +209,7 @@ const EditProfileForm = () => {
       countryShipping,
     } = formValues;
 
-    // Validation (aynı kalacak)
+    // Validation
     const newErrors: Record<string, string> = {
       email: validateEmail(email),
       password: validatePassword(password),
@@ -186,139 +226,231 @@ const EditProfileForm = () => {
       countryShipping: validateCountryShipping(countryShipping),
     };
 
+    // Remove empty errors
     Object.keys(newErrors).forEach((k) => {
       if (!newErrors[k]) delete newErrors[k];
     });
 
     if (Object.keys(newErrors).length) {
       setErrors(newErrors);
+      setIsSubmitting(false);
       return;
     }
 
-    // Access token'ı localStorage'dan alıyoruz
+    // Get access token
     const accessToken = localStorage.getItem('access_token');
     if (!accessToken) {
       setErrors({ signUp: 'Authentication token not found. Please login again.' });
+      setIsSubmitting(false);
       return;
     }
 
-    // Version'ı localStorage'dan alıyoruz
-    const versionString = localStorage.getItem('version');
-    const version = versionString ? parseInt(versionString, 10) : 0;
-
-    // Actions dizisi hazırlıyoruz
-    const actions: CustomerUpdateAction[] = [];
-
-    // Sadece değişen alanları ekliyoruz
-    if (email.trim()) {
-      actions.push({ action: 'changeEmail', email: email.trim() });
-    }
-
-    if (password.trim()) {
-      if (!currentPassword.trim()) {
-        setErrors({ signUp: 'Current password is required to change password' });
-        return;
-      }
-
-      actions.push({
-        action: 'changePassword',
-        currentPassword: currentPassword.trim(),
-        newPassword: password.trim(),
-      });
-    }
-
-    if (firstName.trim()) {
-      actions.push({ action: 'setFirstName', firstName: firstName.trim() });
-    }
-
-    if (lastName.trim()) {
-      actions.push({ action: 'setLastName', lastName: lastName.trim() });
-    }
-
-    if (dob) {
-      const formattedDob = dayjs(dob, 'MM/DD/YYYY').format('YYYY-MM-DD');
-      actions.push({ action: 'setDateOfBirth', dateOfBirth: formattedDob });
-    }
-
-    // Address güncelleme - daha basit yaklaşım
-    const addresses = [];
-
-    // Billing address
-    const billingAddress = {
-      key: 'billing-address',
-      streetName: street.trim(),
-      postalCode: postCode.trim(),
-      city: city.trim(),
-      country: country.toUpperCase(),
-    };
-    addresses.push(billingAddress);
-
-    // Shipping address (billing ile aynı değilse)
-    const shippingAddress = {
-      key: 'shipping-address',
-      streetName: streetShipping.trim(),
-      postalCode: postCodeShipping.trim(),
-      city: cityShipping.trim(),
-      country: countryShipping.toUpperCase(),
-    };
-
-    const isSameAddress =
-      billingAddress.streetName === shippingAddress.streetName &&
-      billingAddress.postalCode === shippingAddress.postalCode &&
-      billingAddress.city === shippingAddress.city &&
-      billingAddress.country === shippingAddress.country;
-
-    if (!isSameAddress) {
-      addresses.push(shippingAddress);
-    }
-
-    // Tüm adresleri set etme
-    actions.push({
-      action: 'setAddresses',
-      addresses: addresses,
-    });
-
-    // Default billing address ayarlama
-    if (defaultBilling) {
-      actions.push({
-        action: 'setDefaultBillingAddress',
-        addressKey: 'billing-address',
-      });
-    }
-
-    // Default shipping address ayarlama
-    if (defaultShipping) {
-      actions.push({
-        action: 'setDefaultShippingAddress',
-        addressKey: isSameAddress ? 'billing-address' : 'shipping-address',
-      });
-    }
+    let currentVersion = getCurrentVersion();
+    const updateResults: UpdateResult[] = [];
+    const failedUpdates: string[] = [];
 
     try {
-      const updatedCustomer = await editCustomerActions(version, actions, accessToken);
-
-      // Yeni version'ı localStorage'a kaydediyoruz
-      localStorage.setItem('version', updatedCustomer.version.toString());
-
-      // Redux store'u güncelliyoruz
-      await dispatch(fetchMe()).unwrap();
-
-      navigate('/');
-    } catch (err: unknown) {
-      console.error('Update error:', err);
-      let message = 'An unexpected error occurred.';
-
-      if (axios.isAxiosError(err)) {
-        const data = err.response?.data as ErrorResponse;
-        message = data.error_description ?? data.message ?? message;
-
-        // Detaylı hata bilgisi için
-        if (err.response?.status === 400) {
-          console.error('Bad Request Details:', err.response.data);
+      // 1. Update basic profile information
+      if (firstName.trim()) {
+        const result = await updateField(
+          [{ action: 'setFirstName', firstName: firstName.trim() }],
+          currentVersion,
+          accessToken,
+          'firstName',
+        );
+        updateResults.push(result);
+        if (result.success) {
+          currentVersion++;
+        } else {
+          failedUpdates.push(`First Name: ${result.error}`);
         }
       }
 
-      setErrors({ signUp: message });
+      if (lastName.trim()) {
+        const result = await updateField(
+          [{ action: 'setLastName', lastName: lastName.trim() }],
+          currentVersion,
+          accessToken,
+          'lastName',
+        );
+        updateResults.push(result);
+        if (result.success) {
+          currentVersion++;
+        } else {
+          failedUpdates.push(`Last Name: ${result.error}`);
+        }
+      }
+
+      // 2. Update date of birth
+      if (dob) {
+        const formattedDob = dayjs(dob, 'MM/DD/YYYY').format('YYYY-MM-DD');
+        const result = await updateField(
+          [{ action: 'setDateOfBirth', dateOfBirth: formattedDob }],
+          currentVersion,
+          accessToken,
+          'dateOfBirth',
+        );
+        updateResults.push(result);
+        if (result.success) {
+          currentVersion++;
+        } else {
+          failedUpdates.push(`Date of Birth: ${result.error}`);
+        }
+      }
+
+      // 3. Update email (if changed)
+      if (email.trim()) {
+        const result = await updateField(
+          [{ action: 'changeEmail', email: email.trim() }],
+          currentVersion,
+          accessToken,
+          'email',
+        );
+        updateResults.push(result);
+        if (result.success) {
+          currentVersion++;
+        } else {
+          failedUpdates.push(`Email: ${result.error}`);
+        }
+      }
+
+      // 4. Update password (if provided)
+      if (password.trim()) {
+        if (!currentPassword.trim()) {
+          failedUpdates.push('Password: Current password is required');
+        } else {
+          const result = await updateField(
+            [
+              {
+                action: 'changePassword',
+                currentPassword: currentPassword.trim(),
+                newPassword: password.trim(),
+              },
+            ],
+            currentVersion,
+            accessToken,
+            'password',
+          );
+          updateResults.push(result);
+          if (result.success) {
+            currentVersion++;
+          } else {
+            failedUpdates.push(`Password: ${result.error}`);
+          }
+        }
+      }
+
+      // 5. Update addresses
+      if (street.trim() && city.trim() && postCode.trim() && country) {
+        const addresses = [];
+
+        // Billing address
+        const billingAddress = {
+          key: 'billing-address',
+          streetName: street.trim(),
+          postalCode: postCode.trim(),
+          city: city.trim(),
+          country: country.toUpperCase(),
+        };
+        addresses.push(billingAddress);
+
+        // Shipping address
+        const shippingAddress = {
+          key: 'shipping-address',
+          streetName: streetShipping.trim() || street.trim(),
+          postalCode: postCodeShipping.trim() || postCode.trim(),
+          city: cityShipping.trim() || city.trim(),
+          country: (countryShipping || country).toUpperCase(),
+        };
+
+        const isSameAddress =
+          billingAddress.streetName === shippingAddress.streetName &&
+          billingAddress.postalCode === shippingAddress.postalCode &&
+          billingAddress.city === shippingAddress.city &&
+          billingAddress.country === shippingAddress.country;
+
+        if (!isSameAddress) {
+          addresses.push(shippingAddress);
+        }
+
+        const result = await updateField(
+          [{ action: 'setAddresses', addresses: addresses }],
+          currentVersion,
+          accessToken,
+          'addresses',
+        );
+        updateResults.push(result);
+        if (result.success) {
+          currentVersion++;
+        } else {
+          failedUpdates.push(`Addresses: ${result.error}`);
+        }
+
+        // 6. Update default billing address
+        if (defaultBilling && result.success) {
+          const defaultBillingResult = await updateField(
+            [{ action: 'setDefaultBillingAddress', addressKey: 'billing-address' }],
+            currentVersion,
+            accessToken,
+            'defaultBilling',
+          );
+          if (defaultBillingResult.success) {
+            currentVersion++;
+          } else {
+            failedUpdates.push(`Default Billing: ${defaultBillingResult.error}`);
+          }
+        }
+
+        // 7. Update default shipping address
+        if (defaultShipping && result.success) {
+          const defaultShippingResult = await updateField(
+            [
+              {
+                action: 'setDefaultShippingAddress',
+                addressKey: isSameAddress ? 'billing-address' : 'shipping-address',
+              },
+            ],
+            currentVersion,
+            accessToken,
+            'defaultShipping',
+          );
+          if (defaultShippingResult.success) {
+            currentVersion++;
+          } else {
+            failedUpdates.push(`Default Shipping: ${defaultShippingResult.error}`);
+          }
+        }
+      }
+
+      // Update version in localStorage
+      localStorage.setItem('version', currentVersion.toString());
+
+      // Refresh user data in Redux store
+      try {
+        await dispatch(fetchMe()).unwrap();
+      } catch (err) {
+        console.warn('Failed to refresh user data:', err);
+      }
+
+      // Show results to user
+      const successCount = updateResults.filter((r) => r.success).length;
+
+      if (failedUpdates.length === 0) {
+        // All updates successful
+        navigate('/');
+      } else if (successCount > 0) {
+        // Partial success
+        const message = `Profile partially updated. ${successCount} field(s) updated successfully.\n\nFailed updates:\n${failedUpdates.join('\n')}`;
+        setErrors({ signUp: message });
+      } else {
+        // All updates failed
+        setErrors({ signUp: `All updates failed:\n${failedUpdates.join('\n')}` });
+      }
+    } catch (err) {
+      console.error('Unexpected error during profile update:', err);
+      setErrors({ signUp: 'An unexpected error occurred during the update process.' });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

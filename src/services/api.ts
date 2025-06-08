@@ -213,25 +213,22 @@ export async function getCustomerProfileMe(accessToken: string): Promise<Custome
   return resp.data;
 }
 
-// api.ts - Düzeltilmiş editCustomerActions fonksiyonu
-
 export async function editCustomerActions(
   version: number,
   actions: CustomerUpdateAction[],
-  accessToken: string, // Customer token'ı parametre olarak alıyoruz
 ): Promise<Customer> {
   const projectKey = import.meta.env.VITE_CT_PROJECT_KEY;
   const apiHost = import.meta.env.VITE_CT_API_URL;
-
-  // /me endpoint'ini kullanarak customer'ın kendi profilini güncellemesi
-  const url = `${apiHost}/${projectKey}/me`;
+  const token = await getServiceToken([`manage_customers:${projectKey}`]);
+  const customerId = localStorage.getItem('id');
+  const url = `${apiHost}/${projectKey}/customers/${customerId}`;
 
   const response = await axios.post<Customer>(
     url,
     { version, actions },
     {
       headers: {
-        Authorization: `Bearer ${accessToken}`, // Customer token kullanıyoruz
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     },
