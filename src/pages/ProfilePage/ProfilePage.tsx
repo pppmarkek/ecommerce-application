@@ -123,9 +123,9 @@ export default function ProfilePage() {
             boxShadow: 24,
             p: 3,
             width: '90%',
-            maxWidth: 600, // ✅ daha küçük maksimum genişlik
-            maxHeight: '90vh', // ✅ ekran taşmalarını önler
-            overflowY: 'auto', // ✅ içeri taşarsa scroll bar gösterir
+            maxWidth: 600,
+            maxHeight: '90vh',
+            overflowY: 'auto',
             borderRadius: 2,
           }}
         >

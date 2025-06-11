@@ -11,6 +11,7 @@ const SignupPage = lazy(() => import('./pages/SignupPage/SignupPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage/NotFoundPage'));
 const ProductPage = lazy(() => import('./pages/ProductPage/ProductPage'));
 const ProfilePage = lazy(() => import('./pages/ProfilePage/ProfilePage'));
+const CartPage = lazy(() => import('./pages/CartPage/CartPage'));
 
 function App() {
   return (
@@ -74,6 +75,14 @@ function App() {
           element={
             <PrivateRoute>
               <ProfilePage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/cart"
+          element={
+            <PrivateRoute>
+              <CartPage />
             </PrivateRoute>
           }
         />

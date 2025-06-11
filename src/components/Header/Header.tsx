@@ -1,6 +1,7 @@
 import { Button } from '../Button/Button';
 import { HeaderContainer, StyledImage, ButtonWrapper } from './style';
 import { useNavigate } from 'react-router-dom';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 export function Header() {
   const navigate = useNavigate();
@@ -30,6 +31,9 @@ export function Header() {
         </Button>
         <Button width="100px" onClick={handleLogout}>
           Logout
+        </Button>
+        <Button width="auto" onClick={() => navigate('/cart')}>
+          <ShoppingCartIcon />
         </Button>
       </ButtonWrapper>
     </HeaderContainer>

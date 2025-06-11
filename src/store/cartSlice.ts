@@ -35,8 +35,30 @@ const cartSlice = createSlice({
     clearCart: (state) => {
       state.length = 0;
     },
+    addQuantity: (state, action) => {
+      const itemId = action.payload;
+      const item = state.find((i) => i.id === itemId);
+      if (item) {
+        item.quantity += 1;
+      }
+    },
+    removeQuantity: (state, action) => {
+      const itemId = action.payload;
+      const item = state.find((i) => i.id === itemId);
+      if (item && item.quantity > 1) {
+        item.quantity -= 1;
+      } else if (item && item.quantity === 1) {
+        const index = state.findIndex((i) => i.id === itemId);
+        if (index !== -1) {
+          state.splice(index, 1);
+        }
+      } else {
+        console.warn(`Item with id ${itemId} not found or quantity is already 1.`);
+      }
+    },
   },
 });
 
-export const { addToCart, removeFromCart, clearCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, clearCart, addQuantity, removeQuantity } =
+  cartSlice.actions;
 export default cartSlice.reducer;

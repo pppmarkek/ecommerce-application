@@ -108,7 +108,6 @@ export default function HomePage(): JSX.Element {
         categoryId: selectedCategoryId ?? undefined,
         sort: sortOrder.startsWith('name.') && !searchQuery ? sortOrder : undefined,
       });
-      console.log('Fetched products:', response);
       setItems(response.results as Item[]);
       setTotal(response.total);
     } finally {

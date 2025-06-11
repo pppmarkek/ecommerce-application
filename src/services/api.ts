@@ -1,10 +1,5 @@
 import axios from 'axios';
-import {
-  CustomerDraft,
-  Customer,
-  CustomerUpdate,
-  CustomerUpdateAction,
-} from '@commercetools/platform-sdk';
+import { CustomerDraft, Customer, CustomerUpdateAction } from '@commercetools/platform-sdk';
 import { Product } from '@/types/product';
 
 export interface CustomerTokenResponse {
