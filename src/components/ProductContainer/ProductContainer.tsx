@@ -11,6 +11,10 @@ import {
 } from './style';
 import { useNavigate } from 'react-router-dom';
 import { useInView } from 'react-intersection-observer';
+import { Button } from '../Button/Button';
+import { AppDispatch } from '@/store';
+import { useDispatch } from 'react-redux';
+import { addToCart } from '@/store/cartSlice';
 
 interface ProductContainerProps {
   id: string;
@@ -32,6 +36,7 @@ const ProductContainer = React.memo(function ProductContainer({
   discountedPrice,
 }: ProductContainerProps) {
   const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>();
   const hasDiscount = discountedPrice !== undefined && discountedPrice < price;
   const { ref, inView } = useInView({ triggerOnce: true, threshold: 0.1 });
   const original = price / 100;
@@ -51,6 +56,11 @@ const ProductContainer = React.memo(function ProductContainer({
   const avifSrc = `${base}&format=avif`;
   const webpSrc = `${base}&format=webp`;
   const jpegSrc = base;
+
+  const handleAddToCart = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.stopPropagation();
+    dispatch(addToCart({ id, title, img, price, currencyCode, smallDescription, discountedPrice }));
+  };
 
   return (
     <Wrapper hasDiscount={hasDiscount} onClick={() => navigate(`/product/${id}`)} ref={ref}>
@@ -77,6 +87,8 @@ const ProductContainer = React.memo(function ProductContainer({
           <Typography variant="subtitle1">{formattedOriginal}</Typography>
         )}
       </TextWrapper>
+
+      <Button onClick={(event) => handleAddToCart(event)}>Add to cart</Button>
     </Wrapper>
   );
 });

@@ -17,7 +17,7 @@ export const Wrapper = styled(Box, {
   borderColor: hasDiscount ? '#d32f2f' : '#818181',
   borderRadius: '10px',
   width: '260px',
-  height: '380px',
+  height: '440px',
   cursor: 'pointer',
   transition: 'all 0.3s',
   '&:hover': {
