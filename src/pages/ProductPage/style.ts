@@ -151,3 +151,9 @@ export const CloseModalButton = styled(Button)`
     background: #3f3f3f;
   }
 `;
+
+export const ProductButtonsBox = styled(Grid)`
+  padding-top: 20px;
+  flex-wrap: nowrap;
+  gap: 10px;
+`;

@@ -11,11 +11,13 @@ import {
   ModalImageBox,
   StyledModal,
   CloseModalButton,
+  ProductButtonsBox,
 } from './style';
 import { getProductById } from '../../services/api';
 import { Product } from '@/types/product';
 import AliceCarousel from 'react-alice-carousel';
 import 'react-alice-carousel/lib/alice-carousel.css';
+import { Button } from '../../components/Button/Button';
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
@@ -24,12 +26,20 @@ export default function ProductPage() {
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = React.useState(false);
   const [initialSlide, setInitialSlide] = useState(0);
+  const [inCart, setInCart] = useState(false);
   const handleOpen = (idx: number) => {
     setInitialSlide(idx);
     setOpen(true);
   };
   const handleClose = () => setOpen(false);
   const locale = 'en-US';
+
+  const addtoCard = () => {
+    setInCart(true);
+  };
+  const removeFromeCard = () => {
+    setInCart(false);
+  };
 
   useEffect(() => {
     if (!id) return;
@@ -109,7 +119,6 @@ export default function ProductPage() {
               renderNextButton={renderNextButton}
             />
           </ImageBox>
-
           <Grid>
             <Typography variant="h4" sx={{ wordBreak: 'break-word' }}>
               {name[locale]}
@@ -128,6 +137,14 @@ export default function ProductPage() {
                 </Typography>
               )}
             </Grid>
+            <ProductButtonsBox container>
+              <Button onClick={addtoCard} disabled={inCart}>
+                Add
+              </Button>
+              <Button onClick={removeFromeCard} disabled={!inCart}>
+                Remove
+              </Button>
+            </ProductButtonsBox>
           </Grid>
         </ProductBoxTopSide>
         <ProductDescription container>
