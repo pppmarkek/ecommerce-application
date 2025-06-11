@@ -69,19 +69,19 @@ export default function ProfilePage() {
         <span>Billing Address</span>
         <Row>
           <Label>Street:</Label>
-          <Value>{profile.addresses?.[0].streetName}</Value>
+          <Value>{profile.addresses?.[0]?.streetName ?? '-'}</Value>
         </Row>
         <Row>
           <Label>City:</Label>
-          <Value>{profile.addresses?.[0].city}</Value>
+          <Value>{profile.addresses?.[0]?.city ?? '-'}</Value>
         </Row>
         <Row>
           <Label>Postal Code:</Label>
-          <Value>{profile.addresses?.[0].postalCode}</Value>
+          <Value>{profile.addresses?.[0]?.postalCode ?? '-'}</Value>
         </Row>
         <Row>
           <Label>Country:</Label>
-          <Value>{profile.addresses?.[0].country}</Value>
+          <Value>{profile.addresses?.[0]?.country ?? '-'}</Value>
         </Row>
       </Card>
 
@@ -89,19 +89,19 @@ export default function ProfilePage() {
         <span>Shipping Address</span>
         <Row>
           <Label>Street:</Label>
-          <Value>{profile.addresses?.[1].streetName}</Value>
+          <Value>{profile.addresses?.[1]?.streetName ?? '-'}</Value>
         </Row>
         <Row>
           <Label>City:</Label>
-          <Value>{profile.addresses?.[1].city}</Value>
+          <Value>{profile.addresses?.[1]?.city ?? '-'}</Value>
         </Row>
         <Row>
           <Label>Postal Code:</Label>
-          <Value>{profile.addresses?.[1].postalCode}</Value>
+          <Value>{profile.addresses?.[1]?.postalCode ?? '-'}</Value>
         </Row>
         <Row>
           <Label>Country:</Label>
-          <Value>{profile.addresses?.[1].country}</Value>
+          <Value>{profile.addresses?.[1]?.country ?? '-'}</Value>
         </Row>
       </Card>
 

@@ -1,64 +1,145 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { RootState } from '@/store';
+import {
+  Cart,
+  getCartById,
+  createCart,
+  addLineItem,
+  changeLineItemQty,
+  removeLineItem,
+  getProductById,
+  addDiscountCode,
+  deleteCart,
+} from '@/services/api';
 
 export interface CartItem {
   id: string;
+  productId: string;
   title: string;
   img: string;
   price: number;
   currencyCode: string;
   quantity: number;
-  smallDescription: string;
   discountedPrice?: number;
 }
+interface State {
+  id: string;
+  version: number;
+  currencyCode: string;
+  total: number;
+  original: number;
+  items: CartItem[];
+  loading: boolean;
+  country?: string;
+}
+const initial: State = {
+  id: '',
+  version: 0,
+  currencyCode: '',
+  total: 0,
+  original: 0,
+  items: [],
+  loading: false,
+};
 
-const initialState: CartItem[] = [];
-const cartSlice = createSlice({
+const mapCart = (c: Cart): State => {
+  const original = c.lineItems.reduce((s, l) => s + l.price.value.centAmount * l.quantity, 0);
+  return {
+    id: c.id,
+    version: c.version,
+    currencyCode: c.totalPrice.currencyCode,
+    total: c.totalPrice.centAmount,
+    original,
+    loading: false,
+    items: c.lineItems.map((l) => ({
+      id: l.id,
+      productId: l.productId,
+      title: l.name['en-US'] ?? '',
+      img: l.variant.images?.[0]?.url ?? '',
+      price: l.price.discounted?.value.centAmount ?? l.price.value.centAmount,
+      currencyCode: l.price.value.currencyCode,
+      quantity: l.quantity,
+      discountedPrice: l.price.discounted?.value.centAmount,
+    })),
+  };
+};
+const loadId = () => localStorage.getItem('cart_id') ?? '';
+const saveId = (id: string) => localStorage.setItem('cart_id', id);
+
+export const fetchCart = createAsyncThunk<State>('cart/fetch', async () => {
+  const stored = loadId();
+  let cart = stored ? await getCartById(stored) : null;
+  if (!cart) cart = await createCart('USD');
+  saveId(cart.id);
+  return mapCart(cart);
+});
+export const addToCart = createAsyncThunk<
+  State,
+  { productId: string; qty?: number },
+  { state: RootState }
+>('cart/add', async ({ productId, qty = 1 }, { getState }) => {
+  const prod = await getProductById(productId);
+  const variant = prod.masterData.current.masterVariant;
+  const price = variant.prices?.find((p) => p.country) || variant.prices?.[0];
+  if (!price) throw new Error('no price');
+  const cur = price.value.currencyCode;
+  const country = price.country;
+  let { id, version } = getState().cart;
+  const { currencyCode } = getState().cart;
+  if (!id || currencyCode !== cur) {
+    const c = await createCart(cur, country);
+    saveId(c.id);
+    id = c.id;
+    version = c.version;
+  }
+  const updated = await addLineItem(id, version, productId, variant.id, qty);
+  return mapCart(updated);
+});
+export const changeQty = createAsyncThunk<
+  State,
+  { lineItemId: string; qty: number },
+  { state: RootState }
+>('cart/qty', async ({ lineItemId, qty }, { getState }) =>
+  mapCart(await changeLineItemQty(getState().cart.id, getState().cart.version, lineItemId, qty)),
+);
+export const removeItem = createAsyncThunk<State, { lineItemId: string }, { state: RootState }>(
+  'cart/rm',
+  async ({ lineItemId }, { getState }) =>
+    mapCart(await removeLineItem(getState().cart.id, getState().cart.version, lineItemId)),
+);
+export const applyCode = createAsyncThunk<State, string, { state: RootState }>(
+  'cart/applyCode',
+  async (promoCodeValue, { getState }) => {
+    const { id, version } = getState().cart;
+    const updated = await addDiscountCode(id, version, promoCodeValue);
+    return mapCart(updated);
+  },
+);
+export const clearCart = createAsyncThunk<State, void, { state: RootState }>(
+  'cart/clear',
+  async (_, { getState }) => {
+    const { id, version, currencyCode, country } = getState().cart;
+    if (id) {
+      await deleteCart(id, version);
+    }
+    const c = await createCart(currencyCode || 'USD', country);
+    saveId(c.id);
+    return mapCart(c);
+  },
+);
+
+const slice = createSlice({
   name: 'cart',
-  initialState,
-  reducers: {
-    addToCart: (state, action) => {
-      const item = action.payload as CartItem;
-      const existingItem = state.find((i) => i.id === item.id);
-      if (existingItem) {
-        existingItem.quantity += 1;
-      } else {
-        state.push({ ...item, quantity: 1 });
-      }
-    },
-    removeFromCart: (state, action) => {
-      const itemId = action.payload;
-      const index = state.findIndex((i) => i.id === itemId);
-      if (index !== -1) {
-        state.splice(index, 1);
-      }
-    },
-    clearCart: (state) => {
-      state.length = 0;
-    },
-    addQuantity: (state, action) => {
-      const itemId = action.payload;
-      const item = state.find((i) => i.id === itemId);
-      if (item) {
-        item.quantity += 1;
-      }
-    },
-    removeQuantity: (state, action) => {
-      const itemId = action.payload;
-      const item = state.find((i) => i.id === itemId);
-      if (item && item.quantity > 1) {
-        item.quantity -= 1;
-      } else if (item && item.quantity === 1) {
-        const index = state.findIndex((i) => i.id === itemId);
-        if (index !== -1) {
-          state.splice(index, 1);
-        }
-      } else {
-        console.warn(`Item with id ${itemId} not found or quantity is already 1.`);
-      }
-    },
+  initialState: initial,
+  reducers: {},
+  extraReducers: (b) => {
+    b.addCase(fetchCart.fulfilled, (_, a) => a.payload)
+      .addCase(addToCart.fulfilled, (_, a) => a.payload)
+      .addCase(changeQty.fulfilled, (_, a) => a.payload)
+      .addCase(removeItem.fulfilled, (_, a) => a.payload)
+      .addCase(applyCode.fulfilled, (_, a) => a.payload)
+      .addCase(clearCart.fulfilled, (_, a) => a.payload);
   },
 });
-
-export const { addToCart, removeFromCart, clearCart, addQuantity, removeQuantity } =
-  cartSlice.actions;
-export default cartSlice.reducer;
+export const selectCart = (s: RootState) => s.cart ?? initial;
+export default slice.reducer;
