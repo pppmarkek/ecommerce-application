@@ -14,6 +14,8 @@ const ProfilePage = lazy(() => import('./pages/ProfilePage/ProfilePage'));
 const CartPage = lazy(() => import('./pages/CartPage/CartPage'));
 
 function App() {
+  const isLoggedIn = Boolean(localStorage.getItem('token'));
+
   return (
     <Suspense
       fallback={
@@ -64,11 +66,7 @@ function App() {
         />
         <Route
           path="*"
-          element={
-            <PublicRoute>
-              <NotFoundPage />
-            </PublicRoute>
-          }
+          element={<PublicRoute>{isLoggedIn ? <NotFoundPage /> : <LoginPage />}</PublicRoute>}
         />
         <Route
           path="/profile"
