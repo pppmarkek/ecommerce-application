@@ -121,12 +121,22 @@ export const getAllProducts = async (
   ).data;
 };
 
-export const getProductById = async (id: string) =>
-  (
-    await axios.get<Product>(`${e('VITE_CT_API_URL')}/${e('VITE_CT_PROJECT_KEY')}/products/${id}`, {
-      headers: await hdr(`view_products:${e('VITE_CT_PROJECT_KEY')}`),
-    })
-  ).data;
+export async function getProductById(id: string): Promise<Product> {
+  const projectKey = import.meta.env.VITE_CT_PROJECT_KEY;
+  const apiHost = import.meta.env.VITE_CT_API_URL;
+  const token = await getServiceToken([`view_products:${projectKey}`]);
+  const url = `${apiHost}/${projectKey}/products/${id}`;
+
+  const resp = await axios.get<Product>(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (resp.status !== 200) {
+    const err = resp.data as unknown as ErrorResponse;
+    throw new Error(err.message ?? `Failed to fetch product ${id}`);
+  }
+  return resp.data;
+}
 
 const cartHeaders = async () => ({
   Authorization: `Bearer ${await svc([`manage_orders:${e('VITE_CT_PROJECT_KEY')}`])}`,
@@ -144,6 +154,7 @@ export const createCart = async (currency: string, country?: string) => {
     })
   ).data;
 };
+
 export const getCartById = async (id: string) => {
   try {
     return (
@@ -155,6 +166,7 @@ export const getCartById = async (id: string) => {
     return null;
   }
 };
+
 const cartReq = async (id: string, v: number, actions: CartUpdateAction[]) =>
   (
     await axios.post<Cart>(
@@ -233,3 +245,12 @@ export async function editCustomerActions(
 
   return response.data;
 }
+
+export const setCartCountry = async (id: string, version: number, country: string) =>
+  (
+    await axios.post<Cart>(
+      `${e('VITE_CT_API_URL')}/${e('VITE_CT_PROJECT_KEY')}/carts/${id}`,
+      { version, actions: [{ action: 'setCountry', country }] },
+      { headers: await cartHeaders() },
+    )
+  ).data;

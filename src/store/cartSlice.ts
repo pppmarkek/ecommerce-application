@@ -10,6 +10,7 @@ import {
   getProductById,
   addDiscountCode,
   deleteCart,
+  setCartCountry,
 } from '@/services/api';
 
 export interface CartItem {
@@ -48,6 +49,7 @@ const mapCart = (c: Cart): State => {
     id: c.id,
     version: c.version,
     currencyCode: c.totalPrice.currencyCode,
+    country: (c as Cart & { country?: string }).country ?? undefined,
     total: c.totalPrice.centAmount,
     original,
     loading: false,
@@ -73,6 +75,7 @@ export const fetchCart = createAsyncThunk<State>('cart/fetch', async () => {
   saveId(cart.id);
   return mapCart(cart);
 });
+
 export const addToCart = createAsyncThunk<
   State,
   { productId: string; qty?: number },
@@ -80,21 +83,35 @@ export const addToCart = createAsyncThunk<
 >('cart/add', async ({ productId, qty = 1 }, { getState }) => {
   const prod = await getProductById(productId);
   const variant = prod.masterData.current.masterVariant;
-  const price = variant.prices?.find((p) => p.country) || variant.prices?.[0];
-  if (!price) throw new Error('no price');
+
+  const price = variant.prices?.find((p) => p.country) ?? variant.prices?.[0];
+  if (!price) throw new Error('Price not found');
   const cur = price.value.currencyCode;
-  const country = price.country;
-  let { id, version } = getState().cart;
-  const { currencyCode } = getState().cart;
-  if (!id || currencyCode !== cur) {
-    const c = await createCart(cur, country);
+  const needCountry = price.country;
+
+  const { id, version, currencyCode, country } = getState().cart;
+
+  if (!id) {
+    const c = await createCart(cur, needCountry);
     saveId(c.id);
-    id = c.id;
-    version = c.version;
+    return mapCart(await addLineItem(c.id, c.version, productId, variant.id, qty));
   }
+
+  if (currencyCode !== cur) {
+    const c = await createCart(cur, needCountry);
+    saveId(c.id);
+    return mapCart(await addLineItem(c.id, c.version, productId, variant.id, qty));
+  }
+
+  if (needCountry && needCountry !== country) {
+    const fixed = await setCartCountry(id, version, needCountry);
+    return mapCart(await addLineItem(fixed.id, fixed.version, productId, variant.id, qty));
+  }
+
   const updated = await addLineItem(id, version, productId, variant.id, qty);
   return mapCart(updated);
 });
+
 export const changeQty = createAsyncThunk<
   State,
   { lineItemId: string; qty: number },
@@ -102,11 +119,13 @@ export const changeQty = createAsyncThunk<
 >('cart/qty', async ({ lineItemId, qty }, { getState }) =>
   mapCart(await changeLineItemQty(getState().cart.id, getState().cart.version, lineItemId, qty)),
 );
+
 export const removeItem = createAsyncThunk<State, { lineItemId: string }, { state: RootState }>(
   'cart/rm',
   async ({ lineItemId }, { getState }) =>
     mapCart(await removeLineItem(getState().cart.id, getState().cart.version, lineItemId)),
 );
+
 export const applyCode = createAsyncThunk<State, string, { state: RootState }>(
   'cart/applyCode',
   async (promoCodeValue, { getState }) => {
@@ -141,5 +160,6 @@ const slice = createSlice({
       .addCase(clearCart.fulfilled, (_, a) => a.payload);
   },
 });
+
 export const selectCart = (s: RootState) => s.cart ?? initial;
 export default slice.reducer;
