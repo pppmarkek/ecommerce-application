@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { Typography, CircularProgress, Grid } from '@mui/material';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Typography, CircularProgress, Grid, IconButton } from '@mui/material';
 import {
   Wrapper,
   ProductBox,
@@ -12,12 +12,19 @@ import {
   StyledModal,
   CloseModalButton,
   ProductButtonsBox,
+  QuantityBox,
 } from './style';
+
 import { getProductById } from '../../services/api';
 import { Product } from '@/types/product';
 import AliceCarousel from 'react-alice-carousel';
 import 'react-alice-carousel/lib/alice-carousel.css';
 import { Button } from '../../components/Button/Button';
+import RemoveIcon from '@mui/icons-material/Remove';
+import AddIcon from '@mui/icons-material/Add';
+import { useDispatch } from 'react-redux';
+import { AppDispatch } from '@/store';
+import { addToCart } from '@/store/cartSlice';
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
@@ -26,7 +33,10 @@ export default function ProductPage() {
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = React.useState(false);
   const [initialSlide, setInitialSlide] = useState(0);
-  const [inCart, setInCart] = useState(false);
+  const [quantity, setQuantity] = useState(1);
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+
   const handleOpen = (idx: number) => {
     setInitialSlide(idx);
     setOpen(true);
@@ -34,15 +44,27 @@ export default function ProductPage() {
   const handleClose = () => setOpen(false);
   const locale = 'en-US';
 
-  const addtoCard = () => {
-    setInCart(true);
-  };
-  const removeFromeCard = () => {
-    setInCart(false);
+  const handleDecrease = () => {
+    setQuantity((q) => Math.max(1, q - 1));
   };
 
+  const handleIncrease = () => {
+    setQuantity((q) => q + 1);
+  };
+
+  const handleAdd = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    dispatch(addToCart({ productId: id!, qty: quantity }));
+    setQuantity(1);
+  };
+
+  const removeFromeCard = () => {};
+
   useEffect(() => {
-    if (!id) return;
+    if (!id) {
+      navigate('/404');
+      return;
+    }
     setLoading(true);
     getProductById(id)
       .then((p) => {
@@ -54,7 +76,7 @@ export default function ProductPage() {
         setError(err.message);
       })
       .finally(() => setLoading(false));
-  }, [id]);
+  }, [id, navigate]);
 
   if (loading) {
     return (
@@ -119,11 +141,11 @@ export default function ProductPage() {
               renderNextButton={renderNextButton}
             />
           </ImageBox>
-          <Grid>
+          <Grid minWidth={'350px'}>
             <Typography variant="h4" sx={{ wordBreak: 'break-word' }}>
               {name[locale]}
             </Typography>
-            <Grid>
+            <Grid marginBottom={'20px'}>
               <Typography
                 variant={hasSale ? 'subtitle1' : 'h5'}
                 sx={{ textDecoration: hasSale ? 'line-through' : 'none' }}
@@ -137,11 +159,22 @@ export default function ProductPage() {
                 </Typography>
               )}
             </Grid>
+            <QuantityBox container>
+              <IconButton
+                onClick={handleDecrease}
+                disabled={quantity <= 1}
+                aria-label="Decrease quantity"
+              >
+                <RemoveIcon />
+              </IconButton>
+              {quantity}
+              <IconButton onClick={handleIncrease} aria-label="Increase quantity">
+                <AddIcon />
+              </IconButton>
+            </QuantityBox>
             <ProductButtonsBox container>
-              <Button onClick={addtoCard}>Add</Button>
-              <Button onClick={removeFromeCard} disabled={!inCart}>
-                Remove
-              </Button>
+              <Button onClick={handleAdd}>Add</Button>
+              <Button onClick={removeFromeCard}>Remove</Button>
             </ProductButtonsBox>
           </Grid>
         </ProductBoxTopSide>

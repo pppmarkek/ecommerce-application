@@ -158,3 +158,14 @@ export const ProductButtonsBox = styled(Grid)`
   flex-wrap: nowrap;
   gap: 10px;
 `;
+
+export const QuantityBox = styled(Grid)`
+  height: auto;
+  max-width: 180px;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #818181;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+`;
