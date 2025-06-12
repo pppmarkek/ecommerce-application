@@ -22,9 +22,9 @@ import 'react-alice-carousel/lib/alice-carousel.css';
 import { Button } from '../../components/Button/Button';
 import RemoveIcon from '@mui/icons-material/Remove';
 import AddIcon from '@mui/icons-material/Add';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '@/store';
-import { addToCart } from '@/store/cartSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '@/store';
+import { addToCart, removeItem } from '@/store/cartSlice';
 
 export default function ProductPage() {
   const { id } = useParams<{ id: string }>();
@@ -36,6 +36,8 @@ export default function ProductPage() {
   const [quantity, setQuantity] = useState(1);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+  const cart = useSelector((state: RootState) => state.cart);
+  const lineItem = cart.items.find((li) => li.productId === id);
 
   const handleOpen = (idx: number) => {
     setInitialSlide(idx);
@@ -58,7 +60,11 @@ export default function ProductPage() {
     setQuantity(1);
   };
 
-  const removeFromeCard = () => {};
+  const handleRemove = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!lineItem) return;
+    dispatch(removeItem({ lineItemId: lineItem.id }));
+  };
 
   useEffect(() => {
     if (!id) {
@@ -174,7 +180,9 @@ export default function ProductPage() {
             </QuantityBox>
             <ProductButtonsBox container>
               <Button onClick={handleAdd}>Add</Button>
-              <Button onClick={removeFromeCard}>Remove</Button>
+              <Button onClick={handleRemove} disabled={!lineItem}>
+                Remove
+              </Button>
             </ProductButtonsBox>
           </Grid>
         </ProductBoxTopSide>
