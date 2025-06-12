@@ -138,9 +138,7 @@ export default function ProductPage() {
               )}
             </Grid>
             <ProductButtonsBox container>
-              <Button onClick={addtoCard} disabled={inCart}>
-                Add
-              </Button>
+              <Button onClick={addtoCard}>Add</Button>
               <Button onClick={removeFromeCard} disabled={!inCart}>
                 Remove
               </Button>

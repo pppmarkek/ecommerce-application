@@ -153,6 +153,7 @@ export const CloseModalButton = styled(Button)`
 `;
 
 export const ProductButtonsBox = styled(Grid)`
+  max-width: 180px;
   padding-top: 20px;
   flex-wrap: nowrap;
   gap: 10px;
