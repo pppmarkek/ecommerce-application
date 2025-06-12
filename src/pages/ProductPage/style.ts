@@ -59,7 +59,7 @@ export const ProductBoxTopSide = styled(Grid)`
 
 export const ImageContainer = styled('img')`
   width: 100%;
-  height: 250px;
+  height: 100%;
   object-fit: cover;
   border-radius: 10px;
 `;
@@ -69,8 +69,7 @@ export const ProductDescription = styled(Grid)`
 `;
 
 export const ImageBox = styled(Grid)`
-  width: 20%;
-  height: 100%;
+  width: 30%;
   @media (max-width: 1076px) {
     width: 100%;
   }
@@ -86,13 +85,9 @@ export const StyledModal = styled(Modal)`
 `;
 
 export const ModalImageBox = styled(Grid)`
-  width: 50%;
+  width: 30%;
   background-color: rgb(83, 83, 83);
   border-radius: 10px;
-
-  .alice-carousel__stage-item * {
-    height: 500px;
-  }
 
   .alice-carousel__dots {
     margin: 0px 3px 5px;
@@ -123,17 +118,14 @@ export const ModalImageBox = styled(Grid)`
   }
 
   @media (max-width: 1260px) {
-    width: 70%;
+    width: 50%;
   }
 
   @media (max-width: 1076px) {
-    width: 90%;
+    width: 50%;
   }
   @media (max-width: 700px) {
     width: 90%;
-    .alice-carousel__stage-item * {
-      height: 300px;
-    }
   }
 `;
 
