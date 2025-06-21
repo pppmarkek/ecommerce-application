@@ -4,6 +4,7 @@ import { Route, Routes } from 'react-router-dom';
 import { PublicRoute } from './routes/PublicRoute';
 import { PrivateRoute } from './routes/PrivateRoute';
 import { CircularProgress, Box } from '@mui/material';
+import AboutUsPage from './pages/AboutUsPage/AboutUsPage';
 
 const HomePage = lazy(() => import('./pages/HomePage/HomePage'));
 const LoginPage = lazy(() => import('./pages/LoginPage/LoginPage'));
@@ -81,6 +82,14 @@ function App() {
           element={
             <PrivateRoute>
               <CartPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/aboutUs"
+          element={
+            <PrivateRoute>
+              <AboutUsPage />
             </PrivateRoute>
           }
         />

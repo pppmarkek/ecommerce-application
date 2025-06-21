@@ -21,6 +21,10 @@ export function Header() {
     navigate('/profile');
   };
 
+  const handleAbout = () => {
+    navigate('/aboutUs');
+  };
+
   return (
     <HeaderContainer>
       <button
@@ -31,6 +35,9 @@ export function Header() {
       </button>
 
       <ButtonWrapper>
+        <Button width="110px" onClick={handleAbout}>
+          About Us
+        </Button>
         <Button width="100px" onClick={handleProfile}>
           Profile
         </Button>
