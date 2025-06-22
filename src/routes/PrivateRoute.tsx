@@ -1,3 +1,4 @@
+import { Header } from '@/components/Header/Header';
 import NotFoundPage from '@/pages/NotFoundPage/NotFoundPage';
 import { ReactNode } from 'react';
 
@@ -8,5 +9,12 @@ interface PrivateRouteProps {
 export function PrivateRoute({ children }: PrivateRouteProps) {
   const token = localStorage.getItem('accessToken');
 
-  return token ? <>{children}</> : <NotFoundPage />;
+  return token ? (
+    <>
+      <Header />
+      {children}
+    </>
+  ) : (
+    <NotFoundPage />
+  );
 }

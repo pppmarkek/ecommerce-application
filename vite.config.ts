@@ -1,26 +1,34 @@
-import { defineConfig } from 'vitest/config';
+import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import legacy from '@vitejs/plugin-legacy';
+import compression from 'vite-plugin-compression';
 import path from 'path';
 
-export default defineConfig({
-  plugins: [react()],
-  server: { port: 3000 },
-  build: {
-    outDir: 'build',
-    sourcemap: true,
+export default defineConfig(({ mode }) => ({
+  server: {
+    port: 3000,
   },
+
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),
     },
   },
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './src/setupTests.ts',
-    coverage: {
-      reporter: ['text', 'lcov'],
-      exclude: ['node_modules/', 'src/main.tsx', 'src/vite-env.d.ts'],
+
+  plugins: [
+    react(),
+    mode === 'production' && legacy({ targets: ['defaults', 'not IE 11'] }),
+    mode === 'production' && compression({ algorithm: 'brotliCompress', ext: '.br' }),
+  ].filter(Boolean),
+
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          mui: ['@mui/material', '@mui/icons-material'],
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+        },
+      },
     },
   },
-});
+}));

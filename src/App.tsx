@@ -1,14 +1,33 @@
+import React, { Suspense, lazy } from 'react';
 import './App.css';
 import { Route, Routes } from 'react-router-dom';
-import { LoginPage } from './pages/LoginPage/LoginPage';
-import { SignupPage } from './pages/SignupPage/SignupPage';
-import { HomePage } from './pages/HomePage/HomePage';
 import { PublicRoute } from './routes/PublicRoute';
 import { PrivateRoute } from './routes/PrivateRoute';
+import { CircularProgress, Box } from '@mui/material';
+
+const HomePage = lazy(() => import('./pages/HomePage/HomePage'));
+const LoginPage = lazy(() => import('./pages/LoginPage/LoginPage'));
+const SignupPage = lazy(() => import('./pages/SignupPage/SignupPage'));
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage/NotFoundPage'));
+const ProductPage = lazy(() => import('./pages/ProductPage/ProductPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage/ProfilePage'));
 
 function App() {
   return (
-    <div className="App">
+    <Suspense
+      fallback={
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: '100vh',
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      }
+    >
       <Routes>
         <Route
           path="/"
@@ -18,7 +37,6 @@ function App() {
             </PrivateRoute>
           }
         />
-
         <Route
           path="/login"
           element={
@@ -35,8 +53,32 @@ function App() {
             </PublicRoute>
           }
         />
+        <Route
+          path="/product/:id"
+          element={
+            <PrivateRoute>
+              <ProductPage />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="*"
+          element={
+            <PublicRoute>
+              <NotFoundPage />
+            </PublicRoute>
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <ProfilePage />
+            </PrivateRoute>
+          }
+        />
       </Routes>
-    </div>
+    </Suspense>
   );
 }
 

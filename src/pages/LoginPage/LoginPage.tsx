@@ -5,13 +5,13 @@ import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { LoginBox, Wrapper } from './style';
 import { Input } from '@/components/Input/Input';
 import { Button } from '@/components/Button/Button';
-import { loginCustomer } from '@/services/api';
+import { getCustomerProfileMe, loginCustomer } from '@/services/api';
 import { useDispatch } from 'react-redux';
 import { fetchMe } from '@/store/userSlice';
 import { AppDispatch } from '@/store';
 import { validateEmail, validatePassword } from '../../utils/validation';
 
-export const LoginPage = () => {
+export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string; login?: string }>({});
@@ -36,6 +36,9 @@ export const LoginPage = () => {
       localStorage.setItem('accessToken', access_token);
       localStorage.setItem('refreshToken', refresh_token);
       await dispatch(fetchMe()).unwrap();
+      const customerProfile = await getCustomerProfileMe(access_token);
+      localStorage.setItem('id', customerProfile.id);
+      console.log('Logged in user:', customerProfile); //burayı ekledim
       navigate('/');
     } catch (err) {
       setErrors({
@@ -114,4 +117,4 @@ export const LoginPage = () => {
       </form>
     </Wrapper>
   );
-};
+}
