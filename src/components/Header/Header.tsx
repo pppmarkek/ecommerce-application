@@ -1,14 +1,15 @@
 import { Button } from '../Button/Button';
-import { HeaderContainer, StyledImage, ButtonWrapper } from './style';
+import { HeaderContainer, StyledImage, ButtonWrapper, CartCount } from './style';
 import { useNavigate } from 'react-router-dom';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
-import { clearCart } from '@/store/cartSlice';
+import { clearCart, selectCart } from '@/store/cartSlice';
 import { AppDispatch } from '@/store';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 export function Header() {
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
+  const cart = useSelector(selectCart);
 
   const handleLogout = () => {
     localStorage.removeItem('accessToken');
@@ -45,6 +46,7 @@ export function Header() {
           Logout
         </Button>
         <Button width="auto" onClick={() => navigate('/cart')}>
+          <CartCount>{cart.items.length >= 9 ? '9+' : cart.items.length}</CartCount>
           <ShoppingCartIcon />
         </Button>
       </ButtonWrapper>

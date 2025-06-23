@@ -1,4 +1,4 @@
-import { styled } from '@mui/material';
+import { Box, styled } from '@mui/material';
 
 export const HeaderContainer = styled('header')`
   display: flex;
@@ -18,4 +18,14 @@ export const StyledImage = styled('img')`
 export const ButtonWrapper = styled('div')`
   display: flex;
   gap: 16px;
+`;
+
+export const CartCount = styled(Box)`
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background-color: #444;
+  height: 25px;
+  width: 25px;
+  border-radius: 50%;
 `;
