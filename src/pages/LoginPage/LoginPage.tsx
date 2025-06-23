@@ -38,7 +38,7 @@ export default function LoginPage() {
       await dispatch(fetchMe()).unwrap();
       const customerProfile = await getCustomerProfileMe(access_token);
       localStorage.setItem('id', customerProfile.id);
-      console.log('Logged in user:', customerProfile); //burayı ekledim
+      console.log('Logged in user:', customerProfile);
       navigate('/');
     } catch (err) {
       setErrors({

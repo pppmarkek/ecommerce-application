@@ -1,6 +1,6 @@
 import { Header } from '@/components/Header/Header';
-import NotFoundPage from '@/pages/NotFoundPage/NotFoundPage';
 import { ReactNode } from 'react';
+import { Navigate } from 'react-router-dom';
 
 interface PrivateRouteProps {
   children: ReactNode;
@@ -9,12 +9,14 @@ interface PrivateRouteProps {
 export function PrivateRoute({ children }: PrivateRouteProps) {
   const token = localStorage.getItem('accessToken');
 
-  return token ? (
+  if (!token) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return (
     <>
       <Header />
       {children}
     </>
-  ) : (
-    <NotFoundPage />
   );
 }

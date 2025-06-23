@@ -45,12 +45,13 @@ import dayjs, { Dayjs } from 'dayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
-import { signUpCustomer, ErrorResponse, loginCustomer } from '@/services/api';
+import { signUpCustomer, loginCustomer } from '@/services/api';
 import type { CustomerDraft } from '@commercetools/platform-sdk';
 import { useDispatch } from 'react-redux';
 import { AppDispatch } from '@/store';
 import { fetchMe } from '@/store/userSlice';
 import countries from './countries.json';
+import { ErrorResponse } from '@commercetools/platform-sdk';
 
 export default function SignupPage() {
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -63,6 +64,7 @@ export default function SignupPage() {
   const [defaultShipping, setDefaultShipping] = useState(false);
   const [sameAsBilling, setSameAsBilling] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
+  type CtpError = ErrorResponse & { error_description?: string };
 
   const handleDefaultBilling = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDefaultBilling(e.target.checked);
@@ -236,7 +238,7 @@ export default function SignupPage() {
     } catch (err: unknown) {
       let message = 'An unexpected error occurred.';
       if (axios.isAxiosError(err)) {
-        const data = err.response?.data as ErrorResponse;
+        const data = err.response?.data as CtpError;
         message = data.error_description ?? data.message ?? message;
       }
       setErrors({ signUp: message });

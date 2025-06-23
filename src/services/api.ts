@@ -1,11 +1,14 @@
 import axios from 'axios';
 import {
-  CustomerDraft,
+  CartUpdateAction,
   Customer,
-  CustomerUpdate,
+  CustomerDraft,
   CustomerUpdateAction,
+  DiscountCode,
+  ErrorResponse,
 } from '@commercetools/platform-sdk';
 import { Product } from '@/types/product';
+import { v4 as uuid } from 'uuid';
 
 export interface CustomerTokenResponse {
   access_token: string;
@@ -14,167 +17,109 @@ export interface CustomerTokenResponse {
   scope: string;
   token_type: string;
 }
-
-export interface ErrorResponse {
-  error?: string;
-  message?: string;
-  error_description?: string;
-}
-
-export interface SignUpResponse {
-  customer: Customer;
-}
-
 export interface Category {
   id: string;
   name: Record<string, string>;
   parent?: { id: string };
 }
-
 export interface CategoryResponse {
   results: Category[];
 }
-
 export interface ProductResponse {
-  count: number;
+  results: Product[];
   total: number;
   offset: number;
   limit: number;
-  results: Product[];
+}
+export interface LineItem {
+  id: string;
+  productId: string;
+  name: Record<string, string>;
+  quantity: number;
+  price: {
+    value: { centAmount: number; currencyCode: string };
+    discounted?: { value: { centAmount: number } };
+  };
+  totalPrice: { centAmount: number; currencyCode: string };
+  variant: { id: number; images: { url: string }[] };
+}
+export interface Cart {
+  id: string;
+  version: number;
+  lineItems: LineItem[];
+  totalPrice: { centAmount: number; currencyCode: string };
+  discountCodes?: { discountCode: DiscountCode }[];
 }
 
-export async function getServiceToken(scopes: string[]): Promise<string> {
-  const authHost = import.meta.env.VITE_CT_AUTH_URL;
-  const clientId = import.meta.env.VITE_CT_CLIENT_ID;
-  const clientSecret = import.meta.env.VITE_CT_CLIENT_SECRET;
-  const url = `${authHost}/oauth/token`;
-  const params = new URLSearchParams({
-    grant_type: 'client_credentials',
-    scope: scopes.join(' '),
-  });
-  const basicAuth = btoa(`${clientId}:${clientSecret}`);
-  const resp = await axios.post<CustomerTokenResponse>(url, params.toString(), {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: `Basic ${basicAuth}`,
-    },
-  });
-  if (resp.status !== 200) {
-    const err = resp.data as unknown as ErrorResponse;
-    throw new Error(err.error_description ?? err.message ?? 'Failed to fetch service token');
-  }
-  return resp.data.access_token;
-}
+const e = (k: string) => import.meta.env[k];
+const basic = `Basic ${btoa(`${e('VITE_CT_CLIENT_ID')}:${e('VITE_CT_CLIENT_SECRET')}`)}`;
+const tokenReq = async (p: URLSearchParams) =>
+  (
+    await axios.post<CustomerTokenResponse>(`${e('VITE_CT_AUTH_URL')}/oauth/token`, p.toString(), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', Authorization: basic },
+    })
+  ).data.access_token;
+export const getServiceToken = async (scopes: string[]) =>
+  tokenReq(new URLSearchParams({ grant_type: 'client_credentials', scope: scopes.join(' ') }));
+const svc = getServiceToken;
+const hdr = async (s: string) => ({ Authorization: `Bearer ${await svc([s])}` });
 
-export const loginCustomer = async (
-  email: string,
-  password: string,
-): Promise<CustomerTokenResponse> => {
-  const projectKey = import.meta.env.VITE_CT_PROJECT_KEY;
-  const authHost = import.meta.env.VITE_CT_AUTH_URL;
-  const clientId = import.meta.env.VITE_CT_CLIENT_ID;
-  const clientSecret = import.meta.env.VITE_CT_CLIENT_SECRET;
-  const url = `${authHost}/oauth/${projectKey}/customers/token`;
-  const params = new URLSearchParams({
-    grant_type: 'password',
-    username: email,
-    password,
-  });
-  const basicAuth = btoa(`${clientId}:${clientSecret}`);
-  const resp = await axios.post<CustomerTokenResponse>(url, params.toString(), {
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: `Basic ${basicAuth}`,
-    },
-  });
-  if (resp.status !== 200) {
-    const errData = resp.data as unknown as ErrorResponse;
-    throw new Error(errData.error_description ?? 'Login error');
-  }
-  return resp.data;
+export const loginCustomer = async (email: string, password: string) =>
+  (
+    await axios.post<CustomerTokenResponse>(
+      `${e('VITE_CT_AUTH_URL')}/oauth/${e('VITE_CT_PROJECT_KEY')}/customers/token`,
+      new URLSearchParams({ grant_type: 'password', username: email, password }).toString(),
+      { headers: { 'Content-Type': 'application/x-www-form-urlencoded', Authorization: basic } },
+    )
+  ).data;
+
+export const signUpCustomer = async (draft: CustomerDraft) =>
+  (
+    await axios.post<{ customer: Customer }>(
+      `${e('VITE_CT_API_URL')}/${e('VITE_CT_PROJECT_KEY')}/customers`,
+      draft,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${await svc([`manage_customers:${e('VITE_CT_PROJECT_KEY')}`])}`,
+        },
+      },
+    )
+  ).data;
+
+export const signIn = async (email: string, password: string) => {
+  const auth = await loginCustomer(email, password);
+  localStorage.setItem('accessToken', auth.access_token);
+  const me = await getCustomerProfileMe(auth.access_token);
+  localStorage.setItem('id', me.id);
+  return auth;
 };
 
-export async function signUpCustomer(draft: CustomerDraft): Promise<SignUpResponse> {
-  const projectKey = import.meta.env.VITE_CT_PROJECT_KEY;
-  const apiHost = import.meta.env.VITE_CT_API_URL;
-  const token = await getServiceToken([`manage_customers:${projectKey}`]);
-  const url = `${apiHost}/${projectKey}/customers`;
-  const resp = await axios.post<SignUpResponse>(url, draft, {
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
-    },
-  });
-  if (resp.status !== 201) {
-    const errData = resp.data as unknown as ErrorResponse;
-    throw new Error(errData.error_description ?? errData.message ?? 'Customer sign-up failed');
-  }
-  return resp.data;
-}
+export const getAllCategories = async () =>
+  (
+    await axios.get<CategoryResponse>(
+      `${e('VITE_CT_API_URL')}/${e('VITE_CT_PROJECT_KEY')}/categories`,
+      { headers: await hdr(`view_categories:${e('VITE_CT_PROJECT_KEY')}`) },
+    )
+  ).data.results;
 
-export interface ProductQueryOptions {
-  offset?: number;
-  limit?: number;
-  categoryId?: string;
-  search?: string;
-  sort?: string;
-  priceMin?: number;
-  priceMax?: number;
-  brand?: string[];
-  color?: string[];
-  size?: string[];
-}
-
-export async function getAllProducts(options: ProductQueryOptions = {}): Promise<ProductResponse> {
-  const { offset = 0, limit = 20, categoryId, search, sort } = options;
-
-  const projectKey = import.meta.env.VITE_CT_PROJECT_KEY;
-  const apiHost = import.meta.env.VITE_CT_API_URL;
-  const token = await getServiceToken([`view_products:${projectKey}`]);
-
-  const params = new URLSearchParams();
-  params.set('offset', String(offset));
-  params.set('limit', String(limit));
-  if (sort?.startsWith('name.')) params.set('sort', sort);
-
+export const getAllProducts = async (
+  p: { offset?: number; limit?: number; categoryId?: string; sort?: string; search?: string } = {},
+) => {
+  const { offset = 0, limit = 20, categoryId, sort, search } = p;
+  const qs = new URLSearchParams({ offset: String(offset), limit: String(limit) });
+  if (sort?.startsWith('name.')) qs.set('sort', sort);
   const where: string[] = [];
   if (categoryId) where.push(`categories(id="${categoryId}")`);
-  if (search?.trim()) {
-    const term = search.trim().replace(/"/g, '\\"');
-    where.push(`name(en-US contains "${term}")`);
-  }
-  if (where.length) params.set('where', where.join(' and '));
-
-  const url = `${apiHost}/${projectKey}/product-projections?${params.toString()}`;
-  const resp = await axios.get<ProductResponse>(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (resp.status !== 200) {
-    const err = resp.data as unknown as ErrorResponse;
-    throw new Error(err.error_description ?? err.message ?? 'Failed to fetch products');
-  }
-  return resp.data;
-}
-
-export async function getAllCategories(): Promise<Category[]> {
-  const projectKey = import.meta.env.VITE_CT_PROJECT_KEY;
-  const apiHost = import.meta.env.VITE_CT_API_URL;
-  const token = await getServiceToken([`view_categories:${projectKey}`]);
-  const all: Category[] = [];
-  let offset = 0;
-  const limit = 100;
-  let hasMore = true;
-  while (hasMore) {
-    const url = `${apiHost}/${projectKey}/categories?limit=${limit}&offset=${offset}`;
-    const resp = await axios.get<CategoryResponse & { count: number; total: number }>(url, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-    all.push(...resp.data.results);
-    hasMore = resp.data.results.length === limit;
-    offset += limit;
-  }
-  return all;
-}
+  if (search?.trim()) where.push(`name(en-US contains "${search.trim().replace(/"/g, '\\"')}")`);
+  if (where.length) qs.set('where', where.join(' and '));
+  return (
+    await axios.get<ProductResponse>(
+      `${e('VITE_CT_API_URL')}/${e('VITE_CT_PROJECT_KEY')}/product-projections?${qs.toString()}`,
+      { headers: await hdr(`view_products:${e('VITE_CT_PROJECT_KEY')}`) },
+    )
+  ).data;
+};
 
 export async function getProductById(id: string): Promise<Product> {
   const projectKey = import.meta.env.VITE_CT_PROJECT_KEY;
@@ -188,10 +133,69 @@ export async function getProductById(id: string): Promise<Product> {
 
   if (resp.status !== 200) {
     const err = resp.data as unknown as ErrorResponse;
-    throw new Error(err.error_description ?? err.message ?? `Failed to fetch product ${id}`);
+    throw new Error(err.message ?? `Failed to fetch product ${id}`);
   }
   return resp.data;
 }
+
+const cartHeaders = async () => ({
+  Authorization: `Bearer ${await svc([`manage_orders:${e('VITE_CT_PROJECT_KEY')}`])}`,
+  'Content-Type': 'application/json',
+});
+export const createCart = async (currency: string, country?: string) => {
+  const body: Record<string, unknown> = {
+    currency,
+    anonymousId: localStorage.getItem('anonymous_id') ?? uuid(),
+  };
+  if (country) body.country = country;
+  return (
+    await axios.post<Cart>(`${e('VITE_CT_API_URL')}/${e('VITE_CT_PROJECT_KEY')}/carts`, body, {
+      headers: await cartHeaders(),
+    })
+  ).data;
+};
+
+export const getCartById = async (id: string) => {
+  try {
+    return (
+      await axios.get<Cart>(`${e('VITE_CT_API_URL')}/${e('VITE_CT_PROJECT_KEY')}/carts/${id}`, {
+        headers: await cartHeaders(),
+      })
+    ).data;
+  } catch {
+    return null;
+  }
+};
+
+const cartReq = async (id: string, v: number, actions: CartUpdateAction[]) =>
+  (
+    await axios.post<Cart>(
+      `${e('VITE_CT_API_URL')}/${e('VITE_CT_PROJECT_KEY')}/carts/${id}`,
+      { version: v, actions },
+      { headers: await cartHeaders() },
+    )
+  ).data;
+export const addLineItem = (id: string, v: number, pid: string, vid: number, q: number) =>
+  cartReq(id, v, [{ action: 'addLineItem', productId: pid, variantId: vid, quantity: q }]);
+export const changeLineItemQty = (id: string, v: number, lid: string, q: number) =>
+  cartReq(id, v, [{ action: 'changeLineItemQuantity', lineItemId: lid, quantity: q }]);
+export const removeLineItem = (id: string, v: number, lid: string) =>
+  cartReq(id, v, [{ action: 'removeLineItem', lineItemId: lid }]);
+export const addDiscountCode = (id: string, v: number, code: string) =>
+  cartReq(id, v, [{ action: 'addDiscountCode', code }]);
+export const deleteCart = async (id: string, version: number) => {
+  await axios.delete(`${e('VITE_CT_API_URL')}/${e('VITE_CT_PROJECT_KEY')}/carts/${id}`, {
+    headers: await cartHeaders(),
+    params: { version },
+  });
+};
+export const listActiveDiscountCodes = async () =>
+  (
+    await axios.get<{ results: DiscountCode[] }>(
+      `${e('VITE_CT_API_URL')}/${e('VITE_CT_PROJECT_KEY')}/discount-codes?where=isActive="true"`,
+      { headers: await hdr(`view_discount_codes:${e('VITE_CT_PROJECT_KEY')}`) },
+    )
+  ).data.results;
 
 export async function getCustomerProfileMe(accessToken: string): Promise<Customer> {
   const projectKey = import.meta.env.VITE_CT_PROJECT_KEY;
@@ -207,7 +211,7 @@ export async function getCustomerProfileMe(accessToken: string): Promise<Custome
 
   if (resp.status !== 200) {
     const err = resp.data as unknown as ErrorResponse;
-    throw new Error(err.error_description ?? err.message ?? 'Failed to fetch customer profile');
+    throw new Error(err.message ?? 'Failed to fetch customer profile');
   }
 
   return resp.data;
@@ -236,8 +240,17 @@ export async function editCustomerActions(
 
   if (response.status !== 200) {
     const err = response.data as unknown as ErrorResponse;
-    throw new Error(err.error_description ?? err.message ?? 'Customer update failed');
+    throw new Error(err.message ?? 'Customer update failed');
   }
 
   return response.data;
 }
+
+export const setCartCountry = async (id: string, version: number, country: string) =>
+  (
+    await axios.post<Cart>(
+      `${e('VITE_CT_API_URL')}/${e('VITE_CT_PROJECT_KEY')}/carts/${id}`,
+      { version, actions: [{ action: 'setCountry', country }] },
+      { headers: await cartHeaders() },
+    )
+  ).data;
